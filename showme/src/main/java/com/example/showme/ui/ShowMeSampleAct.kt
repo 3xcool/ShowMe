@@ -1,0 +1,157 @@
+package com.example.showme.ui
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import com.example.showme.LogCategories
+
+import com.example.showme.ShowMe
+import com.example.showme.WatcherCategories
+import kotlinx.android.synthetic.main.activity_show_me_sample.*
+import java.lang.StringBuilder
+
+import android.widget.ArrayAdapter
+
+
+
+
+class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+
+  private lateinit var mShowMeProduction : ShowMe // ShowMe("ShowMeSample")
+  private lateinit var mShowMeDev : ShowMe // ShowMe("ShowMeSample")
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(com.example.showme.R.layout.activity_show_me_sample)
+
+    mShowMeProduction = ShowMe(true, "Sample-Production", LogCategories.WARNING.type, WatcherCategories.PUBLIC.type, mShowTimeInterval = false)
+    mShowMeDev = ShowMe(true, "Sample-Dev", LogCategories.DEBUG.type, WatcherCategories.DEV.type, mShowTimeInterval = true)
+
+    mShowMeProduction.mTAGPrefix = ""
+    mShowMeDev.mTAGPrefix = ""
+    setSpinners()
+    setClickListeners()
+  }
+
+
+  private fun setSpinners() {
+    var adapterLogCategory = ArrayAdapter.createFromResource(this, com.example.showme.R.array.spinner_log_category,
+      android.R.layout.simple_expandable_list_item_1)
+    adapterLogCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    spinner_category.adapter = adapterLogCategory
+    spinner_category.onItemSelectedListener = this
+
+    var adapterWatcherCategory = ArrayAdapter.createFromResource(this, com.example.showme.R.array.spinner_watcher_category,
+      android.R.layout.simple_expandable_list_item_1)
+    adapterWatcherCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    spinner_watcher.adapter = adapterWatcherCategory
+    spinner_watcher.onItemSelectedListener = this
+  }
+
+  override fun onNothingSelected(p0: AdapterView<*>?) {
+    //do nothing
+  }
+
+  override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, p3: Long) {
+    //do nothing
+//    val text = parent!!.getItemAtPosition(position).toString()
+//    setLogText(text, 0,0)
+  }
+
+  private fun setClickListeners() {
+    btn_clear.setOnClickListener {
+      tv_log.text = "Log"
+    }
+
+    btn_example.setOnClickListener {
+      setExampleLog()
+    }
+
+    btn_log.setOnClickListener {
+      setLogText(et_log_text.text.toString(), spinner_category.selectedItemPosition, spinner_watcher.selectedItemPosition)
+    }
+
+  }
+
+
+  private fun setLogText(msg: String?, category : Int, watcher : Int) {
+    val logMsg = ShowMe().d(msg!!, watcherCategory = watcher, logCategory = category)
+    tv_log.append("\n$logMsg")
+  }
+
+
+  private fun setExampleLog() {
+    mShowMeDev.startLog()
+    mShowMeProduction.startLog()
+    mShowMeProduction.mMaxLogSize = 100
+    val sb = StringBuilder()
+
+    //Log samples
+    sb.append(mShowMeDev.title("All message Type", LogCategories.ALL.type, WatcherCategories.PUBLIC.type, logId = 0) + "\n")
+    sb.append(mShowMeDev.d("This is an unfiltered message", LogCategories.ALL.type, WatcherCategories.PUBLIC.type, logId = 0)+ "\n")
+    Thread.sleep(300)
+    sb.append(mShowMeDev.d("This is a success message", LogCategories.SUCCESS.type, WatcherCategories.PUBLIC.type, logId = 1)+ "\n")
+    Thread.sleep(300)
+    sb.append(mShowMeDev.d("This is an error message", LogCategories.ERROR.type, WatcherCategories.PUBLIC.type, logId = 1 )+ "\n")
+    sb.append(mShowMeDev.d("This is a warning message", LogCategories.WARNING.type, WatcherCategories.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is an event message", LogCategories.EVENT.type, WatcherCategories.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is an info message", LogCategories.INFO.type, WatcherCategories.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is a detail message", LogCategories.DETAIL.type, WatcherCategories.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is a debug message", LogCategories.DEBUG.type, WatcherCategories.PUBLIC.type)+ "\n")
+
+    //Log samples
+    mShowMeProduction.title("Only Error or higher messages", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is a not filtered message", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is a success message", LogCategories.SUCCESS.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is an error message", LogCategories.ERROR.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is a warning message", LogCategories.WARNING.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is an event message", LogCategories.EVENT.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is an info message", LogCategories.INFO.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is a detail message", LogCategories.DETAIL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("This is a debug message", LogCategories.DEBUG.type, WatcherCategories.PUBLIC.type)
+
+
+    mShowMeProduction.d("This is an error message from Guest Watcher", LogCategories.ERROR.type, WatcherCategories.GUEST.type, addSummary = true)
+    mShowMeProduction.d("This is an error message from Public Watcher", LogCategories.ERROR.type, WatcherCategories.PUBLIC.type, addSummary = true)
+
+
+
+    //Wrap
+    mShowMeProduction.mMaxLogSize = 5
+    mShowMeProduction.title("Wrap examples", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.d("1234567890", wrapMsg = false)
+    mShowMeProduction.d("1234567890", wrapMsg = true)
+    mShowMeProduction.d("12345678901", wrapMsg = false)
+    mShowMeProduction.d("12345678901", wrapMsg = true)
+    mShowMeProduction.d("123456789012", wrapMsg = false)
+    mShowMeProduction.d("123456789012", wrapMsg = true)
+
+
+    mShowMeProduction.skipLine(1, "*", 200)
+    mShowMeProduction.mMaxLogSize = 100
+
+    //Design by Contract
+    mShowMeProduction.enableShowMe()
+    mShowMeProduction.title("Design By Contract Example", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    val a = 1
+    var b = 0
+    mShowMeProduction.dbc(a > b, "$a is not greater than $b")
+    b = 3
+    sb.append(mShowMeProduction.dbc(a > b, "$a is not greater than $b")+ "\n")
+
+    //Special chars
+    mShowMeProduction.title("Special chars", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    sb.append(mShowMeProduction.d(ShowMe.getSpecialChars(), addSummary = false, wrapMsg = true)+ "\n")
+
+    //Summary
+    mShowMeProduction.showSummary()
+
+    mShowMeProduction.finishLog()
+    mShowMeDev.finishLog()
+    tv_log.append("\n${sb.toString()}")
+    tv_log.append("\n☕ See Full Log sample in Logcat")
+  }
+
+
+}
