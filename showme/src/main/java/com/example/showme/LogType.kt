@@ -1,6 +1,6 @@
 package com.example.showme
 
-enum class LogCategories(val type: Int) {
+enum class LogType(val type: Int) {
     ALL(7),
     SUCCESS(6),
     ERROR(5),

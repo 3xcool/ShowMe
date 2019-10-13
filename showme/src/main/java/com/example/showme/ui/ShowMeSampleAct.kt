@@ -4,10 +4,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import com.example.showme.LogCategories
+import com.example.showme.LogType
 
 import com.example.showme.ShowMe
-import com.example.showme.WatcherCategories
+import com.example.showme.WatcherType
 import kotlinx.android.synthetic.main.activity_show_me_sample.*
 import java.lang.StringBuilder
 
@@ -25,8 +25,11 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     super.onCreate(savedInstanceState)
     setContentView(com.example.showme.R.layout.activity_show_me_sample)
 
-    mShowMeProduction = ShowMe(true, "Sample-Production", LogCategories.WARNING.type, WatcherCategories.PUBLIC.type, mShowTimeInterval = false)
-    mShowMeDev = ShowMe(true, "Sample-Dev", LogCategories.DEBUG.type, WatcherCategories.DEV.type, mShowTimeInterval = true)
+    mShowMeProduction = ShowMe(true, "Sample-Production", LogType.WARNING.type, WatcherType.PUBLIC.type, mShowTimeInterval = false)
+    mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type, mShowTimeInterval = true, mWriteLog = true)
+
+    mShowMeDev.injectContext(this)  //because we want to write Log
+    mShowMeDev.SHOWME_FOLDER = "FOO"
 
     mShowMeProduction.mTAGPrefix = ""
     mShowMeDev.mTAGPrefix = ""
@@ -72,6 +75,10 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
       setLogText(et_log_text.text.toString(), spinner_category.selectedItemPosition, spinner_watcher.selectedItemPosition)
     }
 
+    btn_read_log.setOnClickListener {
+      tv_log.text = mShowMeDev.readLog() ?: "File is empty"
+    }
+
   }
 
 
@@ -88,38 +95,38 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val sb = StringBuilder()
 
     //Log samples
-    sb.append(mShowMeDev.title("All message Type", LogCategories.ALL.type, WatcherCategories.PUBLIC.type, logId = 0) + "\n")
-    sb.append(mShowMeDev.d("This is an unfiltered message", LogCategories.ALL.type, WatcherCategories.PUBLIC.type, logId = 0)+ "\n")
+    sb.append(mShowMeDev.title("All message Type", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0) + "\n")
+    sb.append(mShowMeDev.d("This is an unfiltered message", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0)+ "\n")
     Thread.sleep(300)
-    sb.append(mShowMeDev.d("This is a success message", LogCategories.SUCCESS.type, WatcherCategories.PUBLIC.type, logId = 1)+ "\n")
+    sb.append(mShowMeDev.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, logId = 1)+ "\n")
     Thread.sleep(300)
-    sb.append(mShowMeDev.d("This is an error message", LogCategories.ERROR.type, WatcherCategories.PUBLIC.type, logId = 1 )+ "\n")
-    sb.append(mShowMeDev.d("This is a warning message", LogCategories.WARNING.type, WatcherCategories.PUBLIC.type)+ "\n")
-    sb.append(mShowMeDev.d("This is an event message", LogCategories.EVENT.type, WatcherCategories.PUBLIC.type)+ "\n")
-    sb.append(mShowMeDev.d("This is an info message", LogCategories.INFO.type, WatcherCategories.PUBLIC.type)+ "\n")
-    sb.append(mShowMeDev.d("This is a detail message", LogCategories.DETAIL.type, WatcherCategories.PUBLIC.type)+ "\n")
-    sb.append(mShowMeDev.d("This is a debug message", LogCategories.DEBUG.type, WatcherCategories.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, logId = 1 )+ "\n")
+    sb.append(mShowMeDev.d("This is a warning message", LogType.WARNING.type, WatcherType.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is an event message", LogType.EVENT.type, WatcherType.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is an info message", LogType.INFO.type, WatcherType.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is a detail message", LogType.DETAIL.type, WatcherType.PUBLIC.type)+ "\n")
+    sb.append(mShowMeDev.d("This is a debug message", LogType.DEBUG.type, WatcherType.PUBLIC.type)+ "\n")
 
     //Log samples
-    mShowMeProduction.title("Only Error or higher messages", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is a not filtered message", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is a success message", LogCategories.SUCCESS.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is an error message", LogCategories.ERROR.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is a warning message", LogCategories.WARNING.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is an event message", LogCategories.EVENT.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is an info message", LogCategories.INFO.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is a detail message", LogCategories.DETAIL.type, WatcherCategories.PUBLIC.type)
-    mShowMeProduction.d("This is a debug message", LogCategories.DEBUG.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.title("Only Error or higher messages", LogType.ALL.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is a not filtered message", LogType.ALL.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is a warning message", LogType.WARNING.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is an event message", LogType.EVENT.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is an info message", LogType.INFO.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is a detail message", LogType.DETAIL.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.d("This is a debug message", LogType.DEBUG.type, WatcherType.PUBLIC.type)
 
 
-    mShowMeProduction.d("This is an error message from Guest Watcher", LogCategories.ERROR.type, WatcherCategories.GUEST.type, addSummary = true)
-    mShowMeProduction.d("This is an error message from Public Watcher", LogCategories.ERROR.type, WatcherCategories.PUBLIC.type, addSummary = true)
+    mShowMeProduction.d("This is an error message from Guest Watcher", LogType.ERROR.type, WatcherType.GUEST.type, addSummary = true)
+    mShowMeProduction.d("This is an error message from Public Watcher", LogType.ERROR.type, WatcherType.PUBLIC.type, addSummary = true)
 
 
 
     //Wrap
     mShowMeProduction.mMaxLogSize = 5
-    mShowMeProduction.title("Wrap examples", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.title("Wrap examples", LogType.ALL.type, WatcherType.PUBLIC.type)
     mShowMeProduction.d("1234567890", wrapMsg = false)
     mShowMeProduction.d("1234567890", wrapMsg = true)
     mShowMeProduction.d("12345678901", wrapMsg = false)
@@ -133,7 +140,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
     //Design by Contract
     mShowMeProduction.enableShowMe()
-    mShowMeProduction.title("Design By Contract Example", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.title("Design By Contract Example", LogType.ALL.type, WatcherType.PUBLIC.type)
     val a = 1
     var b = 0
     mShowMeProduction.dbc(a > b, "$a is not greater than $b")
@@ -141,7 +148,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     sb.append(mShowMeProduction.dbc(a > b, "$a is not greater than $b")+ "\n")
 
     //Special chars
-    mShowMeProduction.title("Special chars", LogCategories.ALL.type, WatcherCategories.PUBLIC.type)
+    mShowMeProduction.title("Special chars", LogType.ALL.type, WatcherType.PUBLIC.type)
     sb.append(mShowMeProduction.d(ShowMe.getSpecialChars(), addSummary = false, wrapMsg = true)+ "\n")
 
     //Summary
