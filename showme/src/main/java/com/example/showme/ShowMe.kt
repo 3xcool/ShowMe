@@ -5,9 +5,7 @@ package com.example.showme
 import android.content.Context
 import android.util.Log
 import android.util.Log.d
-import com.example.fileman.Fileman
-import java.io.File
-import java.lang.StringBuilder
+import com.andrefilgs.fileman.Fileman
 import kotlin.math.min
 
 
@@ -154,7 +152,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
     outputMsg = when (logCategory) {
       LogType.ALL.type -> outputMsg
       LogType.SUCCESS.type -> "$defaultCharSuccess $outputMsg"
-      LogType.ERROR.type -> "${defaultCharError} $outputMsg"
+      LogType.ERROR.type -> "$defaultCharError $outputMsg"
       LogType.WARNING.type -> "$defaultCharWarning $outputMsg"
       LogType.EVENT.type -> "$defaultCharEvent $outputMsg"
       LogType.INFO.type -> "$defaultCharInfo $outputMsg"
@@ -182,7 +180,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
     prepareLogMsg(msg, logCategory, watcherCategory, addSummary, wrapMsg, logId)?.let {
       Log.d(mTAGPrefix + mTAG, it)
       if(mWriteLog && ::mContext.isInitialized) {
-        Fileman.write("$mTAGPrefix $mTAG $it\n", mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILE, true, mShowMeStatus)
+        Fileman.writeAsync("$mTAGPrefix $mTAG $it\n", mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILE, true, mShowMeStatus)
       }
       return it
     }
