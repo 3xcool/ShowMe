@@ -26,7 +26,7 @@ In build.graddle (Project)
 In build.graddle (app)
 ```kotlin
 dependencies {
-implementation 'com.github.3xcool:showme:0.0.1'
+implementation 'com.github.3xcool:showme:0.0.3'
 }
 ```
 
