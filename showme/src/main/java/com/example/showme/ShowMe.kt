@@ -15,11 +15,11 @@ import kotlin.math.min
 
 //todo Production FLAGS
 //mShowMeStatus:        Turn On/Off ShowMe lib
-//mLogCategoryMode:     For Production = Warning, For Development = Debug
-//mWatcherCategoryMode: For Production = Public, For Development = Dev
+//mLogTypeMode:     For Production = Warning, For Development = Debug
+//mWatcherTypeMode: For Production = Public, For Development = Dev
 //mShowMeId:            If you want to show TimeInterval, set a ShowMeId to calculate the same thread Interval
-class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", private val mLogCategoryMode: Int = LogType.DEBUG.type,
-  private val mWatcherCategoryMode: Int = WatcherType.DEV.type, private val mShowTimeInterval: Boolean = false, var mWriteLog: Boolean = false) {
+class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", private val mLogTypeMode: Int = LogType.DEBUG.type,
+  private val mWatcherTypeMode: Int = WatcherType.DEV.type, private val mShowTimeInterval: Boolean = false, var mWriteLog: Boolean = false) {
 
   private lateinit var mContext : Context
 
@@ -83,8 +83,8 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   var defaultCharDebug = "🐞"
 
   //Default Log and Watcher type
-  var defaultLogCategory = LogType.ALL.type
-  var defaultWatcherCategory = WatcherType.PUBLIC.type
+  var defaultLogType = LogType.ALL.type
+  var defaultWatcherType = WatcherType.PUBLIC.type
   var defaultWrapMsg = false
   var defaultAddSummary = false
 
@@ -130,10 +130,10 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Design By Contract
    */
-  fun dbc(rule: Boolean, msg: String): String {
+  fun dbc(rule: Boolean, msg: String, logType: Int? = LogType.ERROR.type, watcherType: Int? = WatcherType.PUBLIC.type): String {
     if (rule) return ""
     //    skipLine()
-    return d("⛔⛔⛔ Broken Contract: $msg", watcherCategory = WatcherType.PUBLIC.type)
+    return d("⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!)
     //    skipLine()
   }
 
@@ -141,15 +141,15 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Log funs
    */
-  private fun prepareLogMsg(msg: String, logCategory: Int = defaultLogCategory, watcherCategory: Int = defaultWatcherCategory, addSummary: Boolean? = defaultAddSummary,
+  private fun prepareLogMsg(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary,
     wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String? {
     if (!mShowMeStatus) return null //don't show
-    if (watcherCategory < mWatcherCategoryMode) return null //don't show
-    if (logCategory < mLogCategoryMode) return null //don't show
+    if (watcherType < mWatcherTypeMode) return null //don't show
+    if (logType < mLogTypeMode) return null //don't show
 
     var outputMsg = if (wrapMsg!!) wrapMessage(msg) else msg
 
-    outputMsg = when (logCategory) {
+    outputMsg = when (logType) {
       LogType.ALL.type -> outputMsg
       LogType.SUCCESS.type -> "$defaultCharSuccess $outputMsg"
       LogType.ERROR.type -> "$defaultCharError $outputMsg"
@@ -175,9 +175,9 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Debug
    */
-  fun d(msg: String, logCategory: Int = defaultLogCategory, watcherCategory: Int = defaultWatcherCategory, addSummary: Boolean? = defaultAddSummary,
+  fun d(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary,
     wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String {
-    prepareLogMsg(msg, logCategory, watcherCategory, addSummary, wrapMsg, logId)?.let {
+    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId)?.let {
       Log.d(mTAGPrefix + mTAG, it)
       if(mWriteLog && ::mContext.isInitialized) {
         Fileman.writeAsync("$mTAGPrefix $mTAG $it\n", mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILE, true, mShowMeStatus)
@@ -191,17 +191,17 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Show only important Logs
    */
-  fun showSummary(logCategory: Int = defaultLogCategory, watcherCategory: Int = defaultWatcherCategory): String {
-    title("SUMMARY", logCategory, watcherCategory)
+  fun showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType): String {
+    title("SUMMARY", logType, watcherType)
     summaryList.forEach {
-      return d(it, logCategory, watcherCategory)
+      return d(it, logType, watcherType)
     }
     return ""
   }
 
-  fun title(msg: String, logCategory: Int = defaultLogCategory, watcherCategory: Int = defaultWatcherCategory, addSummary: Boolean? = false, logId: Int = 0): String {
+  fun title(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0): String {
     skipLine(1, "=")
-    val outputMsg = d(msg.toUpperCase(), logCategory, watcherCategory, addSummary = addSummary, logId = logId)
+    val outputMsg = d(msg.toUpperCase(), logType, watcherType, addSummary = addSummary, logId = logId)
     skipLine(1, "=")
     return outputMsg
   }

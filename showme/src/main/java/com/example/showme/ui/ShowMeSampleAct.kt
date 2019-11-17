@@ -1,19 +1,14 @@
 package com.example.showme.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
 import com.example.showme.LogType
-
 import com.example.showme.ShowMe
 import com.example.showme.WatcherType
 import kotlinx.android.synthetic.main.activity_show_me_sample.*
-import java.lang.StringBuilder
-
-import android.widget.ArrayAdapter
-
-
 
 
 class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -28,7 +23,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     mShowMeProduction = ShowMe(true, "Sample-Production", LogType.WARNING.type, WatcherType.PUBLIC.type, mShowTimeInterval = false)
     mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type, mShowTimeInterval = true, mWriteLog = true)
 
-    mShowMeDev.injectContext(this)  //because we want to write Log
+    mShowMeDev.injectContext(this)  //because we want to write Log, otherwise you don't need to add this
     mShowMeDev.SHOWME_FOLDER = "FOO"
 
     mShowMeProduction.mTAGPrefix = ""
@@ -39,13 +34,13 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
 
   private fun setSpinners() {
-    var adapterLogCategory = ArrayAdapter.createFromResource(this, com.example.showme.R.array.spinner_log_category,
+    val adapterLogCategory = ArrayAdapter.createFromResource(this, com.example.showme.R.array.spinner_log_category,
       android.R.layout.simple_expandable_list_item_1)
     adapterLogCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
     spinner_category.adapter = adapterLogCategory
     spinner_category.onItemSelectedListener = this
 
-    var adapterWatcherCategory = ArrayAdapter.createFromResource(this, com.example.showme.R.array.spinner_watcher_category,
+    val adapterWatcherCategory = ArrayAdapter.createFromResource(this, com.example.showme.R.array.spinner_watcher_category,
       android.R.layout.simple_expandable_list_item_1)
     adapterWatcherCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
     spinner_watcher.adapter = adapterWatcherCategory
@@ -83,14 +78,16 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
 
   private fun setLogText(msg: String?, category : Int, watcher : Int) {
-    val logMsg = ShowMe().d(msg!!, watcherCategory = watcher, logCategory = category)
+    val logMsg = ShowMe().d(msg!!, watcherType = watcher, logType = category)
     tv_log.append("\n$logMsg")
   }
 
 
   private fun setExampleLog() {
     mShowMeDev.startLog()
+    mShowMeDev.deleteLog()
     mShowMeProduction.startLog()
+    mShowMeProduction.deleteLog()
     mShowMeProduction.mMaxLogSize = 100
     val sb = StringBuilder()
 

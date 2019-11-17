@@ -9,6 +9,5 @@ enum class LogType(val type: Int) {
     EVENT(2),
     DETAIL(1),
     DEBUG(0)
-    ;
 }
 
