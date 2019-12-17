@@ -117,7 +117,9 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
 
     mShowMeProduction.d("This is an error message from Guest Watcher", LogType.ERROR.type, WatcherType.GUEST.type, addSummary = true)
+    mShowMeProduction.d("This is another error message from Guest Watcher", LogType.ERROR.type, WatcherType.GUEST.type, addSummary = true)
     mShowMeProduction.d("This is an error message from Public Watcher", LogType.ERROR.type, WatcherType.PUBLIC.type, addSummary = true)
+    mShowMeProduction.d("This is another error message from Public Watcher", LogType.ERROR.type, WatcherType.PUBLIC.type, addSummary = true)
 
 
 

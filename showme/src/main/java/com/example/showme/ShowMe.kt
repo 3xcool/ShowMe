@@ -191,12 +191,11 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Show only important Logs
    */
-  fun showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType): String {
+  fun showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType) {
     title("SUMMARY", logType, watcherType)
     summaryList.forEach {
-      return d(it, logType, watcherType)
+      d(it, logType, watcherType, addSummary = false)
     }
-    return ""
   }
 
   fun title(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0): String {
