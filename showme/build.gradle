@@ -40,3 +40,18 @@ dependencies {
 
     implementation 'com.github.3xcool:fileman:1.0.1'
 }
+
+task deleteJar(type: Delete) {
+    delete 'libs/jars/showme.jar'
+}
+
+//tutorial to create jar: https://stackoverflow.com/questions/21712714/how-to-make-a-jar-out-from-an-android-studio-project
+task createJar(type: Copy) {
+//    from('build/intermediates/bundles/release/') //don't work
+    from('build/intermediates/packaged-classes/release/')
+    into('libs/jars/')
+    include('classes.jar')
+    rename('classes.jar', 'showme.jar')
+}
+
+createJar.dependsOn(deleteJar, build)
