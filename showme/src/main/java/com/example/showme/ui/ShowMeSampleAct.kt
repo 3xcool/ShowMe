@@ -6,8 +6,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.andrefilgs.fileman.FilemanDrivers
-import com.example.showme.LogCatType
 import com.example.showme.LogType
+import com.example.showme.LogcatType
 import com.example.showme.ShowMe
 import com.example.showme.WatcherType
 import kotlinx.android.synthetic.main.activity_show_me_sample.*
@@ -23,9 +23,10 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     super.onCreate(savedInstanceState)
     setContentView(com.example.showme.R.layout.activity_show_me_sample)
 
+    //Don't use mShowTimeInterval parameter. Use setTimeIntervalStatus()
     mShowMeProduction = ShowMe(true, "Sample-Production", LogType.WARNING.type, WatcherType.PUBLIC.type, mShowTimeInterval = false)
     mShowMeProduction.setTimeIntervalStatus(true, true, true, true)
-    mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type, mShowTimeInterval = false)
+    mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type)
 //    mShowMeDev.setTimeIntervalStatus(false, false, true, true)
 
 //    mShowMeDev.injectContext(this)  //deprecated
@@ -105,7 +106,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     mShowMeProduction.mMaxWrapLogSize = 2000
     val sb = StringBuilder()
 
-    //Log samples
+    //Development Log samples
     sb.append(mShowMeDev.title("All messages Type from Sample-Dev", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0) + "\n")  //by default is VERBOSE
     sb.append(mShowMeDev.d("This is not unfiltered message", LogType.ALL.type, WatcherType.PUBLIC.type, showMeId = 0)+ "\n")
     sb.append(mShowMeDev.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, showMeId = 1)+ "\n")
@@ -116,24 +117,27 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     sb.append(mShowMeDev.d("This is a detail message", LogType.DETAIL.type, WatcherType.PUBLIC.type)+ "\n")
     sb.append(mShowMeDev.d("This is a debug message", LogType.DEBUG.type, WatcherType.PUBLIC.type)+ "\n")
 
+    //Using Logcat Types
     mShowMeDev.v("This is a Verbose Logcat", LogType.ALL.type, WatcherType.PUBLIC.type, showMeId = 0)
     mShowMeDev.d("This is a Debug Logcat", LogType.DEBUG.type, WatcherType.PUBLIC.type, showMeId = 0)
-    mShowMeDev.i("This is a Info Logcat", LogType.INFO.type, WatcherType.PUBLIC.type, showMeId = 0)
+    mShowMeDev.i("This is an Info Logcat", LogType.INFO.type, WatcherType.PUBLIC.type, showMeId = 0)
     mShowMeDev.w("This is a Warning Logcat", LogType.WARNING.type, WatcherType.PUBLIC.type, showMeId = 0)
     mShowMeDev.e("This is an Error Logcat", LogType.ERROR.type, WatcherType.PUBLIC.type, showMeId = 0)
 
-    //Log samples
-    mShowMeProduction.title("Only Error or higher messages from Sample-Production", LogType.ALL.type, WatcherType.PUBLIC.type, logCatType = LogCatType.INFO)
+    //Production Log samples
+    mShowMeProduction.title("Only Error or higher messages from Sample-Production", LogType.ALL.type, WatcherType.PUBLIC.type, logcatType = LogcatType.INFO)
     mShowMeProduction.d("This is a not filtered message", LogType.ALL.type, WatcherType.PUBLIC.type, showMeId = 0)
     mShowMeProduction.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, showMeId = 1)
     Thread.sleep(600)
-    mShowMeProduction.d("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, showMeId = 1)
+    mShowMeProduction.e("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, showMeId = 1, addSummary = true)
     Thread.sleep(600)
-    mShowMeProduction.d("This is a warning message", LogType.WARNING.type, WatcherType.PUBLIC.type)
-    mShowMeProduction.d("This is an event message", LogType.EVENT.type, WatcherType.PUBLIC.type)
-    mShowMeProduction.d("This is an info message", LogType.INFO.type, WatcherType.PUBLIC.type)
-    mShowMeProduction.d("This is a detail message", LogType.DETAIL.type, WatcherType.PUBLIC.type)
-    mShowMeProduction.d("This is a debug message", LogType.DEBUG.type, WatcherType.PUBLIC.type)
+    mShowMeProduction.w("This is a warning message", LogType.WARNING.type, WatcherType.PUBLIC.type, addSummary = true)
+
+    //Attention: the following logs will not appear in Summary because mShowMeProduction is set toshow only Warning logs and above
+    mShowMeProduction.e("This is an event message", LogType.EVENT.type, WatcherType.PUBLIC.type, addSummary = true)
+    mShowMeProduction.i("This is an info message", LogType.INFO.type, WatcherType.PUBLIC.type, addSummary = true)
+    mShowMeProduction.d("This is a detail message", LogType.DETAIL.type, WatcherType.PUBLIC.type, addSummary = true)
+    mShowMeProduction.d("This is a debug message", LogType.DEBUG.type, WatcherType.PUBLIC.type, addSummary = true)
 
     mShowMeProduction.d("This is an error message from Guest Watcher", LogType.ERROR.type, WatcherType.GUEST.type, addSummary = true)
     mShowMeProduction.d("This is another error message from Guest Watcher", LogType.ERROR.type, WatcherType.GUEST.type, addSummary = true)
@@ -155,9 +159,9 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
     mShowMeProduction.title("Separators")
     mShowMeProduction.skipLine(1, "▄", 50)
-    mShowMeProduction.skipLine(1, "░", 50, logCatType = LogCatType.DEBUG)
-    mShowMeProduction.skipLine(1, "█", 50, logCatType = LogCatType.INFO)
-    mShowMeProduction.skipLine(1, "─", 50, logCatType = LogCatType.ERROR)
+    mShowMeProduction.skipLine(1, "░", 50, logcatType = LogcatType.DEBUG)
+    mShowMeProduction.skipLine(1, "█", 50, logcatType = LogcatType.INFO)
+    mShowMeProduction.skipLine(1, "─", 50, logcatType = LogcatType.ERROR)
     mShowMeProduction.mMaxWrapLogSize = 100
     mShowMeProduction.d("Changed wrap size to 100", LogType.ALL.type, WatcherType.PUBLIC.type, addSummary = false)
 

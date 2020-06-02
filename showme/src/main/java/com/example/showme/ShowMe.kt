@@ -37,13 +37,14 @@ import kotlin.math.min
  * @param mShowTimeInterval  Is Deprecated
  * @see  setTimeIntervalStatus() for Time Interval logs
  */
-class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", private val mLogTypeMode: Int = LogType.DEBUG.type, private val mWatcherTypeMode: Int = WatcherType.DEV.type, @Deprecated("Use setTimeIntervalStatus() to control the 4 types of Time Interval") private val mShowTimeInterval: Boolean = false) {
+class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", private val mLogTypeMode: Int = LogType.DEBUG.type, private val mWatcherTypeMode: Int = WatcherType.DEV.type,
+             @Deprecated("Use setTimeIntervalStatus() to control the 4 types of Time Interval") private val mShowTimeInterval: Boolean = false) {
 
   //region local variables
   var mTAGPrefix = ""
   var mMaxWrapLogSize = 1500
 
-  private var summaryList: MutableList<String> = mutableListOf()
+  private var summaryList: MutableList<Pair<LogcatType,String>> = mutableListOf()
 
   //For Time control
   var mPrecisionAbsoluteTime = 7
@@ -53,7 +54,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   var mCurrentTimeActive: Boolean = false             //this will be useful for storing log in a file or server.
   var mAbsoluteTimeIntervalActive: Boolean = false
   var mRelativeTimeIntervalActive: Boolean = false
-  var mLogByIdTimeIntervalActive: Boolean = mShowTimeInterval  //to be backward compatible
+  var mRelativeByIdTimeIntervalActive: Boolean = mShowTimeInterval  //to be backward compatible
   var mCurrentTime = getNow()
   var mAbsoluteTimeInterval: Long = mCurrentTime                 //time difference between now and begin (startLog())
   var mRelativeTimeInterval: Long = mCurrentTime                 //time difference between now and last log
@@ -79,9 +80,9 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   var defaultWatcherType = WatcherType.PUBLIC.type
   var defaultWrapMsg = false
   var defaultAddSummary = false
-  var defaultGeneralLogCatType = LogCatType.DEBUG
-  var defaultTitleLogCatType = LogCatType.VERBOSE
-  var defaultSummaryLogCatType = LogCatType.VERBOSE
+  var defaultGeneralLogCatType = LogcatType.DEBUG
+  var defaultTitleLogCatType = LogcatType.VERBOSE
+  var defaultSummaryLogCatType = LogcatType.VERBOSE
 
   //Fileman
   private var mWriteLog = false
@@ -99,11 +100,11 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   }
 
 
-  fun setTimeIntervalStatus(showCurrentTime: Boolean? = false, showAbsolute: Boolean? = false, showRelative: Boolean? = false, showLogById: Boolean? = false) {
+  fun setTimeIntervalStatus(showCurrentTime: Boolean? = false, showAbsolute: Boolean? = false, showRelative: Boolean? = false, showRelativeById: Boolean? = false) {
     showCurrentTime?.let { mCurrentTimeActive = it }
     showAbsolute?.let { mAbsoluteTimeIntervalActive = it }
     showRelative?.let { mRelativeTimeIntervalActive = it }
-    showLogById?.let { mLogByIdTimeIntervalActive = it }
+    showRelativeById?.let { mRelativeByIdTimeIntervalActive = it }
   }
 
   fun setTimeIntervalPrecision(absolute:Int?=mPrecisionAbsoluteTime, relative:Int?=mPrecisionRelativeTime, relativeById:Int?=mPrecisionRelativeByIdTime){
@@ -172,15 +173,16 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Design By Contract
    */
-  fun dbc(rule: Boolean, msg: String, logType: Int? = LogType.ERROR.type, watcherType: Int? = WatcherType.PUBLIC.type, logCatType: LogCatType?=LogCatType.ERROR): String {
+  fun dbc(rule: Boolean, msg: String, logType: Int? = LogType.ERROR.type, watcherType: Int? = WatcherType.PUBLIC.type, logcatType: LogcatType?=LogcatType.WARNING): String {
     if (rule) return ""
     //    skipLine()
-    return showMeLog(logCatType,"⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!)
+    return showMeLog(logcatType,"⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!)
     //    skipLine()
   }
 
 
-  private fun prepareLogMsg(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String? {
+  private fun prepareLogMsg(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg,
+                            showMeId: Int = 0, logcatType: LogcatType?=defaultSummaryLogCatType, withTimePrefix:Boolean?=true): String? {
     if (!mShowMeStatus) return null //don't show
     if (watcherType < mWatcherTypeMode) return null //don't show
     if (logType < mLogTypeMode) return null //don't show
@@ -199,35 +201,41 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
       else -> outputMsg
     }
 
-    if (addSummary!!) summaryList.add(summaryList.size, outputMsg)
-
     var timePrefix = ""
     val currentTime = getNow()
 
-    if (mCurrentTimeActive.orDefault()) timePrefix = "now:${Utils.convertTime(currentTime, Utils.getNowFormat())}"
+    if(withTimePrefix.orDefault(true)){
+      if (mCurrentTimeActive.orDefault()) timePrefix = "now:${Utils.convertTime(currentTime, Utils.getNowFormat())}"
 
-    if (mAbsoluteTimeIntervalActive.orDefault()) {
-      val absoluteTime = currentTime - mAbsoluteTimeInterval
-      timePrefix = "${addTimeDelimiter(timePrefix)}abs:${Utils.convertToSeconds(absoluteTime, mPrecisionAbsoluteTime)}"
-    }
+      if (mAbsoluteTimeIntervalActive.orDefault()) {
+        val absoluteTime = currentTime - mAbsoluteTimeInterval
+        timePrefix = "${addTimeDelimiter(timePrefix)}abs:${Utils.convertToSeconds(absoluteTime, mPrecisionAbsoluteTime)}"
+      }
 
-    if (mRelativeTimeIntervalActive.orDefault()) {
-      val relativeTime = currentTime - mRelativeTimeInterval
-      timePrefix = "${addTimeDelimiter(timePrefix)}rel:${Utils.convertToMilliseconds(relativeTime, mPrecisionRelativeTime)}"
-    }
+      if (mRelativeTimeIntervalActive.orDefault()) {
+        val relativeTime = currentTime - mRelativeTimeInterval
+        timePrefix = "${addTimeDelimiter(timePrefix)}rel:${Utils.convertToMilliseconds(relativeTime, mPrecisionRelativeTime)}"
+      }
 
-    if (mLogByIdTimeIntervalActive.orDefault()) {
-      val interval = currentTime - (mLogsId[showMeId] ?: currentTime)
-      mLogsId[showMeId] = currentTime  //update last time
-//      timePrefix = "${addTimeDelimiter(timePrefix)}ID:$showMeId-rel:${Utils.convertTime(interval, Utils.getMilliseconds())}"
-      timePrefix = "${addTimeDelimiter(timePrefix)}ID:$showMeId-rel:${Utils.convertToMilliseconds(interval, mPrecisionRelativeByIdTime)}"
+      if (mRelativeByIdTimeIntervalActive.orDefault()) {
+        val interval = currentTime - (mLogsId[showMeId] ?: currentTime)
+        mLogsId[showMeId] = currentTime  //update last time
+        //      timePrefix = "${addTimeDelimiter(timePrefix)}ID:$showMeId-rel:${Utils.convertTime(interval, Utils.getMilliseconds())}"
+        timePrefix = "${addTimeDelimiter(timePrefix)}ID:$showMeId-rel:${Utils.convertToMilliseconds(interval, mPrecisionRelativeByIdTime)}"
+      }
     }
 
     //between timePrefix (if exists) and log message
     if (timePrefix.isNotEmpty()) timePrefix = "$timePrefix ║ "
 
-    mRelativeTimeInterval = currentTime  //always updating last log time for relative time interval
     outputMsg = "$timePrefix$outputMsg"
+
+    if (addSummary!!){
+      summaryList.add(summaryList.size, Pair(logcatType ?:defaultSummaryLogCatType, outputMsg))
+    }
+
+    mRelativeTimeInterval = currentTime  //always updating last log time for relative time interval
+
     return outputMsg
   }
 
@@ -238,16 +246,18 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
 
   /**
    * Show only important Logs
+   *
+   * Each log stored in summary is a Log snapshot with respective timePrefix and logcatType
    */
-  fun showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, logCatType: LogCatType?=defaultSummaryLogCatType) {
-    skipLine(1, "─", 100, logCatType =  logCatType)
-    title("SUMMARY", logType, watcherType, logCatType = logCatType)
+  fun showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, logcatType: LogcatType?=defaultSummaryLogCatType) {
+    skipLine(1, "─", 100, logcatType =  logcatType)
+    title("SUMMARY", logType, watcherType, logcatType = logcatType)
     summaryList.forEach {
-      showMeLog(logCatType, it, logType, watcherType, addSummary = false)
+      showMeLog(it.first, it.second, logType, watcherType, addSummary = false, withTimePrefix = false) //summary logs don't need timePrefix, we are using the respective log time prefix
     }
   }
 
-  fun title(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0, logCatType: LogCatType?=defaultTitleLogCatType): String {
+  fun title(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0, logcatType: LogcatType?=defaultTitleLogCatType): String {
 //    var vertical ="║"
     val horiz = "═"
     val topL = "╔"
@@ -255,15 +265,15 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
     val botL = "╚"
     val botR = "╝"
     //Only for LogCat clean view
-    showMeLog(logCatType,"$topL${horiz.repeat(msg.length + 8 )}$topR", addSummary = false, writeLog = false)
-    showMeLog(logCatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, showMeId = logId, writeLog = false)
-    showMeLog(logCatType,"$botL${horiz.repeat(msg.length + 8 )}$botR", addSummary = false, writeLog = false)
+    showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR", addSummary = false, writeLog = false)
+    showMeLog(logcatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, showMeId = logId, writeLog = false)
+    showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR", addSummary = false, writeLog = false)
     return prepareLogMsg(msg, logType, watcherType, addSummary, showMeId= logId) ?: ""  //main title ShowMe log
   }
 
-  fun skipLine(qty: Int = skipLineQty, repeatableChar: String = skipLineRepeatableChar, repeatQty: Int = skipLineRepeatableCharQty, watcherType: Int = defaultWatcherType, logCatType: LogCatType?=defaultGeneralLogCatType) {
+  fun skipLine(qty: Int = skipLineQty, repeatableChar: String = skipLineRepeatableChar, repeatQty: Int = skipLineRepeatableCharQty, watcherType: Int = defaultWatcherType, logcatType: LogcatType?=defaultGeneralLogCatType) {
     for (i in 1..qty) {
-      showMeLog(logCatType, msg = repeatableChar.repeat(repeatQty), watcherType = watcherType)
+      showMeLog(logcatType, msg = repeatableChar.repeat(repeatQty), watcherType = watcherType)
     }
   }
 
@@ -289,16 +299,17 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    * @param addSummary -> Call showSummary() to see all logs stored as important
    * @param wrapMsg -> Wrap or not the Log Message
    * @param showMeId -> For Time Interval calculation by ID
+   * @param withTimePrefix -> if you want to enable/disable timePrefix. Best approach is to use setTimeIntervalStatus()
    */
-  fun showMeLog(logCatType: LogCatType?=LogCatType.VERBOSE, msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary,
-                        wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0, writeLog:Boolean?=mWriteLog): String {
-    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, showMeId)?.let {
-      when (logCatType) {
-        LogCatType.VERBOSE -> Log.v(mTAGPrefix + mTAG, it)
-        LogCatType.DEBUG -> Log.d(mTAGPrefix + mTAG, it)
-        LogCatType.INFO -> Log.i(mTAGPrefix + mTAG, it)
-        LogCatType.WARNING -> Log.w(mTAGPrefix + mTAG, it)
-        LogCatType.ERROR -> Log.e(mTAGPrefix + mTAG, it)
+  fun showMeLog(logcatType: LogcatType?=LogcatType.VERBOSE, msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary,
+                wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0, writeLog:Boolean?=mWriteLog, withTimePrefix: Boolean?=true): String {
+    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, showMeId,logcatType= logcatType, withTimePrefix = withTimePrefix)?.let {
+      when (logcatType) {
+        LogcatType.VERBOSE -> Log.v(mTAGPrefix + mTAG, it)
+        LogcatType.DEBUG -> Log.d(mTAGPrefix + mTAG, it)
+        LogcatType.INFO -> Log.i(mTAGPrefix + mTAG, it)
+        LogcatType.WARNING -> Log.w(mTAGPrefix + mTAG, it)
+        LogcatType.ERROR -> Log.e(mTAGPrefix + mTAG, it)
       }
       if (writeLog.orDefault()) writeLog(it)
       return it
@@ -317,32 +328,34 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    * @param showMeId -> For Time Interval calculation by ID
    */
   fun d(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogCatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+    return showMeLog(LogcatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
   }
 
 
   fun i(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogCatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+    return showMeLog(LogcatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
   }
 
 
   fun w(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogCatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+    return showMeLog(LogcatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
   }
 
   fun e(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogCatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+    return showMeLog(LogcatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
   }
 
 
   fun v(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogCatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+    return showMeLog(LogcatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
   }
 
 
   companion object {
     fun getSpecialChars(): String =
-      "☕ ⭐⭕✨❌⚡❎✅ 🎃 ⛔ 🚫 🔍🐞💩🔊💡 ✋⛔  ⌚⏰⌛⏳❓❔❗❕ " + "✊✋ ↻ ↺ ⏩⏪⏫⏬ ☣☢☠ ⓘ " + "🔧 💣 🔒 🔓🔔🏁🏆🎯  🚩 🎌 ⛳ " + "💉🔮🎊🎉🎂 💰 💱 💲 💳 💴 💵 💶 💷 💸 " + "🚪 📨 📤 📥 📩 🔥☁ 👀 🌁⛅ 🎦🌋 " + "📌 📍📎 📜 📃 📄 📅 📆 📇🔃  ➿  ☔⚓ " + " ⚽⛄⛅⛎ ⛪⛲⛵⛺⛽ 💀 ☠ 👻 👽 👾 " + "🎅 💃 💁 💬 🍰 💎 💍  🏃   "
+      "☕ ⭐⭕✨❌⚡❎✅ 🎃 ⛔ 🚫 🔍🐞💩🔊💡✋⛔⌚⏰⌛⏳❓❔❗❕ " + "✊✋ ↻ ↺ ⏩⏪⏫⏬ ☣☢☠ ⓘ " + "🔧 💣 🔒 🔓🔔🏁🏆🎯  " +
+          "🚩 🎌 ⛳ " + "💉🔮🎊🎉🎂 💰 💱 💲 💳 💴 💵 💶 💷 💸 " + "🚪 📨 📤 📥 📩 🔥☁ 👀 🌁⛅ 🎦🌋 " + "📌 📍📎 📜 📃 📄 📅 📆 📇🔃  ➿  ☔⚓ " + " ⚽⛄⛅⛎ ⛪⛲⛵⛺⛽ 💀 ☠ 👻 👽 👾 " +
+          "🎅 💃 💁 💬 🍰 💎 💍  🏃   "
   }
 
   //region ================ Fileman ================
@@ -413,19 +426,32 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   }
 
 
-  fun deleteLog() {
-    if (::mContext.isInitialized) Fileman.delete(mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILENAME)
+  fun deleteLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME): Boolean {
+    if(drive!! <= FilemanDrivers.values().size){
+      if (::mContext.isInitialized) {
+        Fileman.delete(mContext, drive, folder!!, filename!!)
+      }
+      return false
+    }
+    return false
   }
 
-  fun readLog(): String? {
-    return if (::mContext.isInitialized) Fileman.read(mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILENAME) else null
+  fun readLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME): String? {
+    if(drive!! <= FilemanDrivers.values().size){
+      if (::mContext.isInitialized) {
+        Fileman.read(mContext, drive, folder?:SHOWME_FOLDER, filename?:SHOWME_FILENAME)
+      }
+      return ""
+    }
+    return ""
   }
+
   //endregion
 
 }
 
 
-enum class LogCatType() {
+enum class LogcatType() {
   VERBOSE,
   DEBUG,
   INFO,
