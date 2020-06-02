@@ -158,10 +158,10 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 ## Time Interval
 There are 4 types:
 
-**1) Current:**        show current time with the following format "yyyy-MM-dd, HH:mm:ss:SSS".
-**2) Absolute:**       show elapsed time in milliseconds since startLog() call. 
-**3) Relative:**       show elapsed time in milliseconds since the last log shown.
-**4) Relative by ID:** show elapsed time in milliseconds since the same logID shown. 
+1) **Current:**        show current time with the following format "yyyy-MM-dd, HH:mm:ss:SSS".
+2) **Absolute:**       show elapsed time in milliseconds since startLog() call. 
+3) **Relative:**       show elapsed time in milliseconds since the last log shown.
+4) **Relative by ID:** show elapsed time in milliseconds since the same logID shown. 
 
 You can control which one to show in your Logcat with the fun ```setTimeIntervalStatus()```
 
