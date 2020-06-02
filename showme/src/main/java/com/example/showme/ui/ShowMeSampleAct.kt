@@ -12,6 +12,7 @@ import com.example.showme.ShowMe
 import com.example.showme.WatcherType
 import kotlinx.android.synthetic.main.activity_show_me_sample.*
 
+//Checking compatibility with Android Studio 3.6
 
 class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
