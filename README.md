@@ -155,19 +155,19 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 
 **For more detailed examples, please check ShowMeSampleAct.**
 
-**Now let’s get a deep dive to all resources of this lib**.
-
 ## Time Interval
 There are 4 types:
 
-1) Current: show current time with the following format "yyyy-MM-dd, HH:mm:ss:SSS".
-2) Absolute: show elapsed time in milliseconds since startLog() call. 
-3) Relative: show elapsed time in milliseconds since the last log shown.
-4) Relative by ID: show elapsed time in milliseconds since the same logID shown. 
+**1) Current:**        show current time with the following format "yyyy-MM-dd, HH:mm:ss:SSS".
+**2) Absolute:**       show elapsed time in milliseconds since startLog() call. 
+**3) Relative:**       show elapsed time in milliseconds since the last log shown.
+**4) Relative by ID:** show elapsed time in milliseconds since the same logID shown. 
 
 You can control which one to show in your Logcat with the fun ```setTimeIntervalStatus()```
 
 ```now:2020-06-02, 14:22:39:304 │abs:  0.063s │rel:   63ms │ID:0-rel:  120ms ```
+
+**Now let’s get a deep dive to all resources of this lib**.
 
 # Create ShowMe object
 
