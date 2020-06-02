@@ -338,11 +338,20 @@ Enable showMe at runtime
 ## disableShowMe()
 Disable showMe at runtime.
 
-## readLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
+## Read Log
 Read the content stored in local file.
 
-## deleteLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
+```kotlin
+readLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
+```
+
+
+## Delete Log
 Delete log local file.
+
+```kotlin
+deleteLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
+```
 
 ## getSpecialChars()
 If you want to see alternative special chars to your logs.
