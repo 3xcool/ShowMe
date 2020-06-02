@@ -3,13 +3,39 @@ package com.example.showme.utils
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
- * Auxiliar class to find UTF-8 chars
+ * Auxiliary class to find UTF-8 chars
  */
 class Utils() {
 
   companion object {
+
+    fun getNowFormat():String{
+      return "yyyy-MM-dd, HH:mm:ss:SSS"
+    }
+
+    fun convertToSeconds(timeInMilliseconds:Long, precision:Int):String{
+      val timeDouble = timeInMilliseconds.toDouble() / 1000
+      val format = "%${precision}.3fs"
+      return String.format(Locale("en", "US"),format, timeDouble)
+    }
+
+    fun convertToMilliseconds(timeInMilliseconds:Long, precision:Int):String{
+      val format = "%${precision}dms"
+      return String.format(format, timeInMilliseconds)
+    }
+
+    //"dd EEEE MMMM yyyy, HH:mm a z"
+    //https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat
+    fun convertTime(
+      now: Long,
+      format: String? = "yyyy-MM-dd, HH:mm:ss:SSS",
+      local: Locale? = Locale("pt", "BR")): String {
+      return SimpleDateFormat(format!!, local!!).format(now)
+    }
 
 
     fun utf8Encode(codePoint: Int) = String(intArrayOf(codePoint), 0, 1).toByteArray(Charsets.UTF_8)

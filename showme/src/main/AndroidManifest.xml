@@ -3,7 +3,8 @@
           package="com.example.showme">
 
     <application>
-        <activity android:name=".ui.ShowMeSampleAct">
+        <activity android:name=".ui.ShowMeSampleAct"
+                android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
 

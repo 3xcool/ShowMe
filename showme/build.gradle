@@ -1,22 +1,23 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
-
 apply plugin: 'com.android.library'
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
 
 android {
     compileSdkVersion 29
 
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -38,7 +39,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 
-    implementation 'com.github.3xcool:fileman:1.0.1'
+    implementation 'com.github.3xcool:fileman:2.1.0'
 }
 
 task deleteJar(type: Delete) {

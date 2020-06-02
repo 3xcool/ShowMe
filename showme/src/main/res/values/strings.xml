@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">showme</string>
+    <string name="type_your_log">Type your log</string>
+    <string name="xml_clear">Clear</string>
+    <string name="xml_example">Example</string>
+    <string name="xml_read_from_file">Read from file</string>
+    <string name="xml_log">Log</string>
+    <string name="xml_show">Show</string>
+    <string name="xml_show_me_sample">Show Me sample</string>
 
     <string-array name="spinner_log_category">
         <item>DEBUG</item>
