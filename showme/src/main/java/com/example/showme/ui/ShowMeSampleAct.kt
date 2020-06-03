@@ -108,9 +108,9 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
     //Development Log samples
     sb.append(mShowMeDev.title("All messages Type from Sample-Dev", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0) + "\n")  //by default is VERBOSE
-    sb.append(mShowMeDev.d("This is not unfiltered message", LogType.ALL.type, WatcherType.PUBLIC.type, showMeId = 0)+ "\n")
-    sb.append(mShowMeDev.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, showMeId = 1)+ "\n")
-    sb.append(mShowMeDev.d("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, showMeId = 1 )+ "\n")
+    sb.append(mShowMeDev.d("This is not unfiltered message", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0)+ "\n")
+    sb.append(mShowMeDev.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, logId = 1)+ "\n")
+    sb.append(mShowMeDev.d("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, logId = 1 )+ "\n")
     sb.append(mShowMeDev.d("This is a warning message", LogType.WARNING.type, WatcherType.PUBLIC.type)+ "\n")
     sb.append(mShowMeDev.d("This is an event message", LogType.EVENT.type, WatcherType.PUBLIC.type)+ "\n")
     sb.append(mShowMeDev.d("This is an info message", LogType.INFO.type, WatcherType.PUBLIC.type)+ "\n")
@@ -118,18 +118,18 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     sb.append(mShowMeDev.d("This is a debug message", LogType.DEBUG.type, WatcherType.PUBLIC.type)+ "\n")
 
     //Using Logcat Types
-    mShowMeDev.v("This is a Verbose Logcat", LogType.ALL.type, WatcherType.PUBLIC.type, showMeId = 0)
-    mShowMeDev.d("This is a Debug Logcat", LogType.DEBUG.type, WatcherType.PUBLIC.type, showMeId = 0)
-    mShowMeDev.i("This is an Info Logcat", LogType.INFO.type, WatcherType.PUBLIC.type, showMeId = 0)
-    mShowMeDev.w("This is a Warning Logcat", LogType.WARNING.type, WatcherType.PUBLIC.type, showMeId = 0)
-    mShowMeDev.e("This is an Error Logcat", LogType.ERROR.type, WatcherType.PUBLIC.type, showMeId = 0)
+    mShowMeDev.v("This is a Verbose Logcat", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0)
+    mShowMeDev.d("This is a Debug Logcat", LogType.DEBUG.type, WatcherType.PUBLIC.type, logId = 0)
+    mShowMeDev.i("This is an Info Logcat", LogType.INFO.type, WatcherType.PUBLIC.type, logId = 0)
+    mShowMeDev.w("This is a Warning Logcat", LogType.WARNING.type, WatcherType.PUBLIC.type, logId = 0)
+    mShowMeDev.e("This is an Error Logcat", LogType.ERROR.type, WatcherType.PUBLIC.type, logId = 0)
 
     //Production Log samples
     mShowMeProduction.title("Only Error or higher messages from Sample-Production", LogType.ALL.type, WatcherType.PUBLIC.type, logcatType = LogcatType.INFO)
-    mShowMeProduction.d("This is a not filtered message", LogType.ALL.type, WatcherType.PUBLIC.type, showMeId = 0)
-    mShowMeProduction.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, showMeId = 1)
+    mShowMeProduction.d("This is a not filtered message", LogType.ALL.type, WatcherType.PUBLIC.type, logId = 0)
+    mShowMeProduction.d("This is a success message", LogType.SUCCESS.type, WatcherType.PUBLIC.type, logId = 1)
     Thread.sleep(600)
-    mShowMeProduction.e("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, showMeId = 1, addSummary = true)
+    mShowMeProduction.e("This is an error message", LogType.ERROR.type, WatcherType.PUBLIC.type, logId = 1, addSummary = true)
     Thread.sleep(600)
     mShowMeProduction.w("This is a warning message", LogType.WARNING.type, WatcherType.PUBLIC.type, addSummary = true)
 

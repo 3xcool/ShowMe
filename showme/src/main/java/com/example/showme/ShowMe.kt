@@ -173,10 +173,10 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Design By Contract
    */
-  fun dbc(rule: Boolean, msg: String, logType: Int? = LogType.ERROR.type, watcherType: Int? = WatcherType.PUBLIC.type, logcatType: LogcatType?=LogcatType.WARNING): String {
+  fun dbc(rule: Boolean, msg: String, logType: Int? = LogType.ERROR.type, watcherType: Int? = WatcherType.PUBLIC.type, showMeId:Int?=0, logcatType: LogcatType?=LogcatType.WARNING): String {
     if (rule) return ""
     //    skipLine()
-    return showMeLog(logcatType,"⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!)
+    return showMeLog(logcatType,"⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!, logId = showMeId?:0)
     //    skipLine()
   }
 
@@ -266,7 +266,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
     val botR = "╝"
     //Only for LogCat clean view
     showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR", addSummary = false, writeLog = false)
-    showMeLog(logcatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, showMeId = logId, writeLog = false)
+    showMeLog(logcatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, logId = logId, writeLog = false)
     showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR", addSummary = false, writeLog = false)
     return prepareLogMsg(msg, logType, watcherType, addSummary, showMeId= logId) ?: ""  //main title ShowMe log
   }
@@ -298,12 +298,12 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    * @param watcherType -> See WatcherType class (Public, Guest, Dev)
    * @param addSummary -> Call showSummary() to see all logs stored as important
    * @param wrapMsg -> Wrap or not the Log Message
-   * @param showMeId -> For Time Interval calculation by ID
+   * @param logId -> For Time Interval calculation by ID
    * @param withTimePrefix -> if you want to enable/disable timePrefix. Best approach is to use setTimeIntervalStatus()
    */
   fun showMeLog(logcatType: LogcatType?=LogcatType.VERBOSE, msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary,
-                wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0, writeLog:Boolean?=mWriteLog, withTimePrefix: Boolean?=true): String {
-    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, showMeId,logcatType= logcatType, withTimePrefix = withTimePrefix)?.let {
+                wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog:Boolean?=mWriteLog, withTimePrefix: Boolean?=true): String {
+    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)?.let {
       when (logcatType) {
         LogcatType.VERBOSE -> Log.v(mTAGPrefix + mTAG, it)
         LogcatType.DEBUG -> Log.d(mTAGPrefix + mTAG, it)
@@ -325,29 +325,29 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    * @param watcherType -> See WatcherType class (Public, Guest, Dev)
    * @param addSummary -> Call showSummary() to see all logs stored as important
    * @param wrapMsg -> Wrap or not the Log Message
-   * @param showMeId -> For Time Interval calculation by ID
+   * @param logId -> For Time Interval calculation by ID
    */
-  fun d(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogcatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+  fun d(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String {
+    return showMeLog(LogcatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, logId)
   }
 
 
-  fun i(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogcatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+  fun i(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String {
+    return showMeLog(LogcatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, logId)
   }
 
 
-  fun w(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogcatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+  fun w(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String {
+    return showMeLog(LogcatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, logId)
   }
 
-  fun e(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogcatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+  fun e(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String {
+    return showMeLog(LogcatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, logId)
   }
 
 
-  fun v(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, showMeId: Int = 0): String {
-    return showMeLog(LogcatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, showMeId)
+  fun v(msg: String, logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0): String {
+    return showMeLog(LogcatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, logId)
   }
 
 
