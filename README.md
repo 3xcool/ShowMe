@@ -5,9 +5,29 @@
 # About
 This is a small logger but with powerful resources, extensible API which provides utility on top of Android's normal Log class.
 
-You can control who can see your logs with **WatcherType** and use **LogTypes** with special chars to enhance your Log Reading.
+You can control who can see your logs with **WatcherType** and use **LogTypes** with special chars to enhance your Log reading.
 
-You can also use **Design By Contract**, Summary and store your logs in local file.
+You can also use **Design By Contract**, Summary and store your logs in local file using **Fileman** library.
+
+Control your logs with a powerful **Time Control**. There are 4 types of time described below (Current, Absolute, Relative and Relative by ID).
+
+Use default Logcat types (Verbose, Debug, Info, Warning, Error) to enhance readability and add color control.
+
+# Example
+
+A small log example using ShowMe library.
+
+![](wiki_images/showme_log_example_v1.png) 
+
+
+# Readability
+To enhance readability I've changed line space and Android Logcat colors.
+
+![](wiki_images/logcat_colors.png) 
+
+![](wiki_images/logcat_line_space.png) 
+
+
 
 # Dependency
 
@@ -26,7 +46,7 @@ In build.graddle (Project)
 In build.graddle (app)
 ```kotlin
 dependencies {
-implementation 'com.github.3xcool:showme:0.0.3'
+implementation 'com.github.3xcool:showme:$LATEST_VERSION'
 }
 ```
 
@@ -135,9 +155,19 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 
 **For more detailed examples, please check ShowMeSampleAct.**
 
+## Time Interval
+There are 4 types:
+
+1) **Current:**        show current time with the following format "yyyy-MM-dd, HH:mm:ss:SSS".
+2) **Absolute:**       show elapsed time in milliseconds since startLog() call. 
+3) **Relative:**       show elapsed time in milliseconds since the last log shown.
+4) **Relative by ID:** show elapsed time in milliseconds since the same logID shown. 
+
+You can control which one to show in your Logcat with the fun ```setTimeIntervalStatus()```
+
+```now:2020-06-02, 14:22:39:304 │abs:  0.063s │rel:   63ms │ID:0-rel:  120ms ```
+
 **Now let’s get a deep dive to all resources of this lib**.
-
-
 
 # Create ShowMe object
 
@@ -147,8 +177,8 @@ mShowMeStatus: Boolean = true,
 mTAG: String = "ShowMe", 
 mLogTypeMode: Int = LogType.DEBUG.type,
 mWatcherTypeMode: Int = WatcherType.DEV.type, 
-mShowTimeInterval: Boolean = false, 
-mWriteLog: Boolean = false
+@Deprecated mShowTimeInterval: Boolean = false, 
+@Deprecated mWriteLog: Boolean = false
 )
 
 /*
@@ -156,21 +186,22 @@ mShowMeStatus = show showMe logs, true if you want to show .
 mTAG = add some text before your log message.
 mLogTypeMode = Select your LogType Mode.
 mWatcherTypeMode = Select your WatcherType Mode.
-mShowTimeInterval = show time interval between logs with same ID.
-mWriteLog = true if you want to store your log in local file. Important to injectContext() in order to use this feature.
+
+mShowTimeInterval = Deprecated, use setTimeIntervalStatus() to control the four types of time interval control. Backward versions will use this to show Relative By ID time interval.
+mWriteLog = Deprecated, use buildFileman() to store your logs in a file.
 */
 ```
 
 Example:
 
 ```kotlin
-mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type, mShowTimeInterval = true, mWriteLog = false)
+mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type)
 ```
 
-# d() - Log Debug 
+# Log methods
 
-Main log method to show your debug log. 
-
+Just like the original function Log.d() we have the same for ShowMe.
+To show your log as Verbose v(), Debug d(), Info i(), Warning w() and Error e() using Logcat Category strategy.
 
 ```kotlin
 mShowMeDev.d(
@@ -208,9 +239,9 @@ To increase readability add some title to your logs.
 ```kotlin
 mShowMeDev.title("Some title", LogType.ALL.type, WatcherType.PUBLIC.type)
 /*
-===================
-SOME TITLE
-===================
+╔══════════════════╗
+╠═══ Some title ═══╣
+╚══════════════════╝
 */
 ```
  
@@ -242,9 +273,8 @@ dbc (a > b, "$a is not greater than $b")
 Will show all logs that have been added to summary.
 
 ```kotlin
-showSummary(logCategory: Int = defaultLogType, watcherCategory: Int = defaultWatcherType) 
+showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, logcatType: LogcatType?=defaultSummaryLogCatType) 
 ```
-
 
 # skipLine()
 
@@ -253,10 +283,52 @@ skipLineRepeatableChar = which char to repeat, default is “=”
 skipLineRepeatableCharQty = how many repeatable char, default is 100.
 
 # startLog()
-clear mLogsId in order to restart time interval
+Clear mLogsId, mAbsoluteTimeInterval and mRelativeTimeInterval in order to restart time interval.
 
-# finishLog()
-Clear mLogsId and summaryList
+# clearLog()
+Clear mLogsId and summaryList.
+
+
+# Fileman
+
+ShowMe is using Fileman Library to store your logs into a file. 
+To use it call ```buildFileman()```
+
+```kotlin
+buildFileman(
+showFilemanLog:Boolean?= mShowMeStatus,
+context: Context,
+drive: Int?,
+folder: String?,
+filename: String?,
+append: Boolean?,
+useWorkManager: Boolean? = false,
+viewLifecycleOwner: LifecycleOwner? = null)
+
+/*
+showFilemanLog     -> activate or not Fileman logs.
+drive              -> See FilemanDrivers() class. It can be SandBox (app is installed), Internal (device) or External (SD Card)
+append             -> Set to false to overwrite file
+useWorkManager     -> Set to true if you want to write your log using WorkManager + Coroutine. In most cases you won't need this.
+viewLifecycleOwner -> To observe WorkManager LiveData feedback
+*/
+```
+
+Example 1:
+```kotlin
+showMeObject.buildFileman(false, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true)
+```
+
+Example 2 (With WorkManager):
+```kotlin
+    showMeObject.buildFileman(true, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true, useWorkManager = true, viewLifecycleOwner = this)
+    showMeObject.filemanWM?.filemanFeedback?.observe(this, Observer { output->
+      //Check FilemanFeedback class
+      output.message?.let { Log.d("ShowMe", it) }
+    })
+```
+
+
 
 # Other self explanatory methods:
 
@@ -266,24 +338,33 @@ Enable showMe at runtime
 ## disableShowMe()
 Disable showMe at runtime.
 
-## readLog()
-Read the content stored in local file
+## Read Log
+Read the content stored in local file.
 
-## deleteLog()
-Delete log local file
+```kotlin
+readLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
+```
+
+
+## Delete Log
+Delete log local file.
+
+```kotlin
+deleteLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
+```
 
 ## getSpecialChars()
 If you want to see alternative special chars to your logs.
 
 ## setDefaultCharsValue()
-If you want to change log d() default values.
+If you want to change default values.
 
 ## setSkipLineDefaultValues()
 If you want to change log skipLine() default values.
 
 # License
 
-Copyright 2019 André Filgueiras
+Copyright 2020 André Filgueiras
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
