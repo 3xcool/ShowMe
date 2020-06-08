@@ -1,4 +1,8 @@
 # ShowMe library 
+
+[![Release](https://jitpack.io/v/3xcool/showme.svg)]
+(https://jitpack.io/#3xcool/ShowMe)
+
 ![](wiki_images/showme_icon_200.png) 
 
 
