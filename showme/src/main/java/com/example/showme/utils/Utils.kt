@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.memberProperties
 
 /**
  * Auxiliary class to find UTF-8 chars
@@ -12,6 +15,22 @@ import java.util.*
 class Utils() {
 
   companion object {
+
+    /**
+     * Pass a listof key value pairs to assign object properties, where key is the field name.
+     *
+     * @param obj
+     */
+    fun setFields(obj: Any, fieldsToChange: List<Pair<String, Any?>>) {
+      val nameToProperty = obj::class.memberProperties.associateBy(KProperty<*>::name)
+      fieldsToChange.forEach { (propertyName, propertyValue) ->
+        nameToProperty[propertyName]
+          .takeIf { it is KMutableProperty<*> }
+          ?.let { it as KMutableProperty<*> }
+          ?.let { it.setter.call(obj, propertyValue) }
+      }
+    }
+
 
     fun getNowFormat():String{
       return "yyyy-MM-dd, HH:mm:ss:SSS"

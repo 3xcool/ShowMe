@@ -38,7 +38,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
-                android:id="@+id/spinner_category"
+                android:id="@+id/spinner_log_type"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -59,7 +59,7 @@
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spinner_category" />
+                app:layout_constraintTop_toBottomOf="@+id/spinner_log_type" />
 
         <EditText
                 android:id="@+id/et_log_text"
