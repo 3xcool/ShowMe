@@ -36,10 +36,10 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
   private fun buildShowMe(){
     //Don't use mShowTimeInterval parameter. Use setTimeIntervalStatus()
-    mShowMeDev = ShowMe(true, "ShowMe1", LogType.DEBUG, WatcherType.DEV)
+    mShowMeDev = ShowMe(true, "ShowMe", LogType.DEBUG, WatcherType.DEV)
 //    mShowMeDev.setTimeIntervalStatus(false, false, true, true)
 
-    mShowMeProduction = ShowMe(true, "ShowMe2", LogType.WARNING, WatcherType.PUBLIC, mShowTimeInterval = false)
+    mShowMeProduction = ShowMe(true, "ShowMe", LogType.WARNING, WatcherType.PUBLIC, mShowTimeInterval = false)
     mShowMeProduction.setTimeIntervalStatus(true, true, true, true)
 
 
@@ -68,11 +68,11 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
   //I'm using GSON library for JSON serialization because is the most used one. In the future I will add more options.
   //Just be aware that using your custom object requires Kotlin Reflection (see GsonBodyConverter -> convertToJson)
   private fun buildSender(){
-    val bearer: String = "XXX"
+
+    //CHANGE HERE
     val protocol = "http://"
     val host = "showme.com.br/"
-    val path = "v1/SomeAPI/SaveLog"
-
+    val path = "v1/SomeAPI"
 
 
     val headers : MutableMap<String, String?> = mutableMapOf<String,String?>()
@@ -83,12 +83,15 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     headers.put("Accept", "application/json")
 
     //Building first HTTP Sender
-    val httpSender1 :Sender? = ShowMeHttpSender.Builder()
-      .active(false)
+    val httpSender1 :Sender? = ShowMeHttpSender.Builder(this)
+      .active(true)
       .addHeaders(headers)
       .buildUrl(protocol, host, path, null)
       .addHeader("Connection", "keep-alive")
       .setConverter(PlainTextConverter)
+      .setUseCache(true)
+      .setReadTimeout(10000)
+      .setConnectTimeout(10000)
       .build()
 
     //You can also build like this
@@ -99,7 +102,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
     val userAPIData = UserAPIModel(url = "www.showme.com", message = "some test")
     val gsonConverter = GsonBodyConverter(Gson(), userAPIData, UserAPIModel::payload.name) //showMe logs will be add to payload field.
-    val httpSender2 = ShowMeHttpSender(true, headers, protocol, host, path, null, gsonConverter)
+    val httpSender2 = ShowMeHttpSender(true, applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
@@ -156,6 +159,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val watcher = WatcherType.values()[watcherSel]
 
     val logMsg = ShowMe().d(msg!!, watcherType = watcher, logType = logType)
+//    mShowMeDev.d(msg,logType, watcher)  //if you want to test sender or Fileman
     tv_log.append("\n$logMsg")
   }
 

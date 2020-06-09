@@ -6,6 +6,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class HttpResponse(
 
+    var success: Boolean?=null,
     var responseCode: String? = null,
 
     var url: String? = null,

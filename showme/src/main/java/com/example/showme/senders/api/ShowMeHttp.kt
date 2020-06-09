@@ -1,6 +1,9 @@
 package com.example.showme.senders.api
 
 import android.util.Log
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -10,12 +13,13 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-internal class MyHttp {
+internal class ShowMeHttp {
 
   companion object{
 
-    const val TIMEOUT = 5000
-    const val CONNECTTIMEOUT = 5000
+    const val TIMEOUT :Int = 5000
+    const val CONNECT_TIMEOUT : Int = 5000
+    const val USE_CACHE = false
 
     private val TAG = "ShowMe-Http"
 
@@ -77,8 +81,14 @@ internal class MyHttp {
     }
 
 
+    suspend fun makeRequestAsync(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?,readTimeout:Int?= TIMEOUT, connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE): Deferred<HttpResponse?> {
+      return GlobalScope.async {
+        makeRequest(mUrl, mMethod, mBody, mHeaders, readTimeout, connectTimeout, useCache)
+      }
+    }
+
     @Throws(Exception::class)
-    fun makeRequest(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?): HttpResponse? {
+    fun makeRequest(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT, connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE): HttpResponse? {
       val httpResponse = HttpResponse()
       val url: URL = createUrl(mUrl) ?: return null
 
@@ -88,9 +98,9 @@ internal class MyHttp {
       var inputStream: InputStream? = null
       try {
         urlConnection = url.openConnection() as HttpURLConnection
-        urlConnection.readTimeout = TIMEOUT
-        urlConnection.connectTimeout = CONNECTTIMEOUT
-        urlConnection.useCaches = false //using Cache is better for production
+        urlConnection.readTimeout = readTimeout ?: TIMEOUT
+        urlConnection.connectTimeout = connectTimeout ?: CONNECT_TIMEOUT
+        urlConnection.useCaches = useCache ?: USE_CACHE //using Cache is better for production
         urlConnection.requestMethod = mMethod // GET, POST,HEAD,OPTIONS,PUT,DELETE,TRACE
         urlConnection.setRequestProperty("Accept-Encoding", "gzip") //http://www.rgagnon.com/javadetails/java-HttpUrlConnection-with-GZIP-encoding.html
         //      urlConnection.setRequestProperty("api-key", K.API_KEY);
@@ -107,6 +117,7 @@ internal class MyHttp {
           os.close()
         }
         urlConnection.connect()
+
         //Headers Response
         val headers = urlConnection.headerFields
         for ((headerName, headerValues) in headers) {
@@ -133,7 +144,10 @@ internal class MyHttp {
         httpResponse.method = urlConnection.requestMethod
         httpResponse.url = urlConnection.url.toString()
 
-        if (urlConnection.responseCode != 200 && urlConnection.responseCode != 201) {
+        if (urlConnection.responseCode in 200..299) {
+          httpResponse.success = true
+        }else{
+          httpResponse.success = false
           Log.w(TAG, "HTTP response code: " + urlConnection.responseCode)
         }
       } catch (e: IOException) {
