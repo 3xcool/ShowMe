@@ -61,7 +61,7 @@ sealed class Sender {
  * @param mArguments -> Pass a HashMap that will produce the following concatenated string: "?key=value&key2=value2..."
  * @param bodyConverter -> Send as PlainText or JSON. See Converters class for more info
  */
-internal class ShowMeHttpSender (override var mActive: Boolean?=null,
+class ShowMeHttpSender (override var mActive: Boolean?=null,
                                  private var mContext: Context,
                                  private var mHeaders: MutableMap<String,String?>?=null,
                                  private var mProtocol: String?=null,
