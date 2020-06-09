@@ -10,11 +10,11 @@ sealed class Converters(){
 }
 
 
-internal object PlainTextConverter : Converters() {
+object PlainTextConverter : Converters() {
 }
 
 
-internal class GsonBodyConverter<T : Any>(
+class GsonBodyConverter<T : Any>(
     private val gson: Gson,
     private var pojoObj: T,
     private var logField:String?=null) :Converters() {
