@@ -13,12 +13,10 @@ import com.example.showme.WatcherType
 import com.example.showme.senders.Sender
 import com.example.showme.senders.ShowMeHttpSender
 import com.example.showme.senders.api.converters.GsonBodyConverter
-import com.example.showme.senders.api.converters.PlainTextConverter
 import com.example.showme.senders.api.model.UserAPIModel
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_show_me_sample.*
 
-//Checking compatibility with Android Studio 3.6
 
 class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
@@ -54,7 +52,6 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     //    })
 
 
-
     //You can add Prefix and/or Suffix to ShowMe object TAG. You can add the current classname to your tags for example
     mShowMeProduction.addTagSuffix( "-PROD")
     mShowMeDev.addTagSuffix("-DEV")
@@ -64,10 +61,14 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
   //You can send ShowMe logs to a server using Sender (for now we only have one type -> ShowMeHttpSender)
   //I've no intention to add or replace any powerful REST API library inside ShowMe, so I'm using a simple barebone Http solution (please see ShowMeHttp).
-  //You can send a Plain Text or JSON in HTTP Body. By using JSON you can send as ShowMeAPILogModel or any other model that you want.
+  //You can send a Plain Text or JSON in HTTP Body. By using JSON you can send as ShowMeAPILogModel or any other model that you desire.
   //I'm using GSON library for JSON serialization because is the most used one. In the future I will add more options.
   //Just be aware that using your custom object requires Kotlin Reflection (see GsonBodyConverter -> convertToJson)
   private fun buildSender(){
+
+//    val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
+    val userAPIData = UserAPIModel(url = "www.showme.com", message = "some test", project = "test")  //some user pojo object
+    val gsonConverter = GsonBodyConverter(Gson(), userAPIData, UserAPIModel::payload.name) //showMe logs will be add to payload field.
 
     //CHANGE HERE
     val protocol = "http://"
@@ -88,7 +89,8 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
       .addHeaders(headers)
       .buildUrl(protocol, host, path, null)
       .addHeader("Connection", "keep-alive")
-      .setConverter(PlainTextConverter)
+//      .setConverter(PlainTextConverter)
+      .setConverter(gsonConverter)
       .setUseCache(true)
       .setReadTimeout(10000)
       .setConnectTimeout(10000)
@@ -99,9 +101,6 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val httpSender1 = ShowMeHttpSender(false, headers, protocol, host, path, null, PlainTextConverter)
 
     //Building second HTTP Sender
-//    val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
-    val userAPIData = UserAPIModel(url = "www.showme.com", message = "some test")
-    val gsonConverter = GsonBodyConverter(Gson(), userAPIData, UserAPIModel::payload.name) //showMe logs will be add to payload field.
     val httpSender2 = ShowMeHttpSender(true, applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
@@ -159,7 +158,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val watcher = WatcherType.values()[watcherSel]
 
     val logMsg = ShowMe().d(msg!!, watcherType = watcher, logType = logType)
-//    mShowMeDev.d(msg,logType, watcher)  //if you want to test sender or Fileman
+    mShowMeDev.d(msg,logType, watcher)  //if you want to test Sender or Fileman
     tv_log.append("\n$logMsg")
   }
 

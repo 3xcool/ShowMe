@@ -155,7 +155,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   class Builder(private var context: Context){
 
     private var active: Boolean?=null
-    private var headers: MutableMap<String,String?>?=null
+    private var headers: MutableMap<String,String?> = mutableMapOf()
     private var protocol: String?=null
     private var host: String?=null
     private var path:String?=null
@@ -181,14 +181,12 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     }
 
     fun addHeader(key:String, value:String):Builder{
-      if(this.headers == null) hashMapOf<String,String?>()
-      this.headers?.put(key, value)
+      this.headers[key] = value
       return this
     }
 
     fun addHeaders(headers: Map<String, String?>):Builder{
-      if(this.headers == null) hashMapOf<String,String?>()
-      this.headers?.putAll(headers)
+      this.headers.putAll(headers)
       return this
     }
 
