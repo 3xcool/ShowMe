@@ -9,6 +9,7 @@ import kotlinx.coroutines.coroutineScope
 
 internal class HttpWorker(appContext: Context, workerParams: WorkerParameters)
   : CoroutineWorker(appContext, workerParams) {
+
   override suspend fun doWork(): Result = coroutineScope{
     try {
       val url = inputData.getString(ShowMeConstants.KEY_HTTP_URL)
@@ -17,7 +18,9 @@ internal class HttpWorker(appContext: Context, workerParams: WorkerParameters)
       val readTimeout = inputData.getInt(ShowMeConstants.KEY_HTTP_TIMEOUT, ShowMeHttp.TIMEOUT)
       val connectTimeout = inputData.getInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, ShowMeHttp.CONNECT_TIMEOUT)
       val useCache = inputData.getBoolean(ShowMeConstants.KEY_HTTP_USE_CACHE, ShowMeHttp.USE_CACHE)
-      val httpRequest = ShowMeHttp.makeRequestAsync( url, method, body,  ShowMeConstants.headers, readTimeout, connectTimeout, useCache)
+      val showHttpLogs = inputData.getBoolean(ShowMeConstants.KEY_HTTP_SHOW_HTTP_LOGS, ShowMeHttp.showLogs)
+      val httpRequest = ShowMeHttp.makeRequestAsync( url, method, body,  ShowMeConstants.headers, readTimeout, connectTimeout, useCache, showHttpLogs)
+
       val res = httpRequest.await()
       if(res?.success.orDefault(false)){
         return@coroutineScope Result.success()

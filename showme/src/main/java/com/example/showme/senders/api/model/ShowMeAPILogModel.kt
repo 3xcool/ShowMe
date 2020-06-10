@@ -10,7 +10,9 @@
 
 	@SerializedName("showMeLog")
 	@Expose
-	var showMeLog: String? = null
+	var showMeLog: String? = null,
+
+   @SerializedName("timestamp") @Expose var timestamp: Long? = 0L
 
  ): Parcelable{
 

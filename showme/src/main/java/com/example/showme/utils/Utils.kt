@@ -31,6 +31,9 @@ class Utils() {
       }
     }
 
+    fun getNow(): Long {
+      return System.currentTimeMillis()
+    }
 
     fun getNowFormat():String{
       return "yyyy-MM-dd, HH:mm:ss:SSS"

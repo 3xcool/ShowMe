@@ -17,7 +17,9 @@ object PlainTextConverter : Converters() {
 class GsonBodyConverter<T : Any>(
     private val gson: Gson,
     private var pojoObj: T,
-    private var logField:String?=null) :Converters() {
+    private var logField:String?=null,
+    private var timestampField:String?=null
+) :Converters() {
 
 
   //  private val adapter: TypeAdapter<out Any>? = gson.getAdapter(TypeToken.get(type))
@@ -58,6 +60,7 @@ class GsonBodyConverter<T : Any>(
 //      Log.d("ShowMe-Gson", "Start convert to Generic Json $showMeLog")
       val list = mutableListOf<Pair<String, Any?>>()
       list.add(Pair(logField ?: ShowMeAPILogModel::showMeLog.name, showMeLog))
+      list.add(Pair(timestampField ?: ShowMeAPILogModel::timestamp.name, Utils.getNow()))
       Utils.setFields(pojoObj as Any, list)
       gson.toJson(pojoObj, classType)
 //      val res = gson.toJson(pojoObj, classType)

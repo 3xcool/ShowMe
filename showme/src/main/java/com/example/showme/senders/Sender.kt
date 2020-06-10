@@ -2,6 +2,7 @@ package com.example.showme.senders
 
 
 import android.content.Context
+import android.util.Log
 import androidx.work.*
 import com.andrefilgs.fileman.auxiliar.orDefault
 import com.example.showme.ShowMeConstants
@@ -21,9 +22,6 @@ sealed class Sender {
   abstract var mActive:Boolean?
 
 
-  internal fun getNow():Long{
-    return System.currentTimeMillis()
-  }
 
 //  fun <T> asList(vararg ts: T): List<T> {
 //    val result = ArrayList<T>()
@@ -76,7 +74,8 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
                         private var timeout:Int? = ShowMeHttp.TIMEOUT,
                         private var connectTimeout:Int? = ShowMeHttp.CONNECT_TIMEOUT,
                         private var useCache:Boolean? = ShowMeHttp.USE_CACHE,
-                        private var useWorkManager: Boolean?=false
+                        private var useWorkManager: Boolean?=false,
+                        private var showHttpLogs: Boolean?=false
                         ) : Sender(){
 
 
@@ -87,10 +86,22 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   var workManager: WorkManager = WorkManager.getInstance(mContext)
 
 
+  private val baseCoroutineScope = CoroutineScope(Dispatchers.Default)
+
 
   override val name: String
     get() = ::ShowMeHttpSender.name
 
+  var lastWorkerId:Long=0L
+
+  private fun getWorkerID():Long{
+//    val now = Utils.getNow()
+//    val output =  if(now == lastWorkerId) now.plus(1L)  else now
+    val output:Long = lastWorkerId + 1
+    lastWorkerId = output
+    Log.d("ShowMe", "Worker ID: $output")
+    return output
+  }
 
   /**
    * User can call this fun besides ShowMe automatic sender calls
@@ -113,8 +124,8 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   }
 
   private suspend fun sendLogAsync(content:String, url:String?= mUrl ): Deferred<HttpResponse?> {
-    val res = GlobalScope.async(Dispatchers.Default) {
-      ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache)
+    val res = baseCoroutineScope.async(Dispatchers.Default) {
+      ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs)
     }
     return res //res.await()
   }
@@ -122,15 +133,20 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
 
   //using WorkManager
   private fun sendLogWM(content:String, url:String?=mUrl ){
-    GlobalScope.launch(Dispatchers.Default) {
-      val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache )
-      workManager.beginUniqueWork(getNow().toString(), ExistingWorkPolicy.REPLACE, httpRequest).enqueue()
+    baseCoroutineScope.launch(Dispatchers.Default) {
+//      val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
+      val id = UUID.randomUUID().toString()
+      Log.d("ShowMe", "Worker ID: $id")
+      val httpRequest = buildHttpWorker(id, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
+
+      workManager.beginUniqueWork(id, ExistingWorkPolicy.APPEND, httpRequest).enqueue()
+//      workManager.beginWith( httpRequest).enqueue()
     }
   }
 
   private fun sendLogLaunch(content:String, url:String?=mUrl ){
-    GlobalScope.launch(Dispatchers.Default) {
-      ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache)
+    baseCoroutineScope.launch(Dispatchers.Default) {
+      ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs)
     }
   }
 
@@ -148,15 +164,20 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   /**
    * Just to flag to UI the end of work
    */
-  private fun buildHttpWorker(tag:String, url:String?, method:String?, body:String, headers: Map<String, String?>?,readTimeout:Int?=null, connectTimeout:Int?= null, useCache:Boolean?= null): OneTimeWorkRequest {
+  private fun buildHttpWorker(tag:String, url:String?, method:String?, body:String, headers: Map<String, String?>?,readTimeout:Int?=null, connectTimeout:Int?= null,
+                              useCache:Boolean?= null, showHttpLogs:Boolean?=null): OneTimeWorkRequest {
     val inputData = Data.Builder()
     inputData.putString(ShowMeConstants.KEY_HTTP_TAG, tag)
     inputData.putString(ShowMeConstants.KEY_HTTP_URL, url)
     inputData.putString(ShowMeConstants.KEY_HTTP_METHOD, method)
     inputData.putString(ShowMeConstants.KEY_HTTP_BODY, body)
+
+//    ShowMeConstants.logFifo.add(body)
+
     readTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_TIMEOUT, readTimeout)}
     connectTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, connectTimeout)}
     useCache?.let { inputData.putBoolean(ShowMeConstants.KEY_HTTP_USE_CACHE, useCache)}
+    showHttpLogs?.let { inputData.putBoolean(ShowMeConstants.KEY_HTTP_SHOW_HTTP_LOGS, showHttpLogs)}
     headers?.let { ShowMeConstants.headers = it.toMutableMap() }
     return OneTimeWorkRequest.Builder(HttpWorker::class.java)
       .setConstraints(Constraints.Builder()
@@ -185,6 +206,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     private var connectTimeout :Int? = null
     private var useCache :Boolean? = null
     private var useWorkManager :Boolean? = false
+    private var showHttpLogs :Boolean? = false
 
     fun active(value:Boolean):Builder{
       this.active = value
@@ -239,6 +261,11 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
       return this
     }
 
+    fun showHttpLogs(value: Boolean?): Builder {
+      this.showHttpLogs = value
+      return this
+    }
+
     private fun validateBuilder():Boolean{
       //      checkNotNull(mUrl) { "url == null" }
       return this.url != null
@@ -247,7 +274,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     fun build(): Sender? {
       return if(validateBuilder()){
         ShowMeHttpSender(this.active,this.id, this.context, this.headers, this.protocol, this.host, this.path, this.arguments, this.bodyConverter,
-          this.readTimeout, this.connectTimeout, this.useCache, this.useWorkManager)
+          this.readTimeout, this.connectTimeout, this.useCache, this.useWorkManager, this.showHttpLogs)
       }else{
         null
       }

@@ -16,7 +16,8 @@ class UserAPIModel(
 
     @SerializedName("Message") @Expose var message: String? = null,
 
-    @SerializedName("Project") @Expose var project: String? = null
+    @SerializedName("Project") @Expose var project: String? = null,
+    @SerializedName("timestamp") @Expose var timestamp: Long? = 0L
 
 
 ) : Parcelable {

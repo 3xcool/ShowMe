@@ -67,7 +67,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
   private fun buildSender(){
 
 //    val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
-    val userAPIData = UserAPIModel(url = "www.showme.com", message = "some test", project = "test")  //some user pojo object
+    val userAPIData = UserAPIModel(url = "www.showme.com", message = "some test", project = "andre")  //some user pojo object
     val gsonConverter = GsonBodyConverter(Gson(), userAPIData, UserAPIModel::payload.name) //showMe logs will be add to payload field.
 
     //CHANGE HERE
@@ -93,10 +93,11 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //      .addHeader("Connection", "keep-alive")
 //      .setConverter(PlainTextConverter)
       .setConverter(gsonConverter)
-      .setUseCache(true)
+      .setUseCache(false)
       .setReadTimeout(10000)
       .setConnectTimeout(10000)
-      .setUseWorkManager(true)
+      .setUseWorkManager(false)
+      .showHttpLogs(true)
       .build()
 
     //You can also build like this
@@ -104,12 +105,13 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val httpSender1 = ShowMeHttpSender(false,null, applicationContext ,headers, protocol, host, path, null, bodyConverter =  PlainTextConverter)
 
     //Building second HTTP Sender
-    val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,true)
+    val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,
+      10000,10000,false, true, true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
     //Add Senders
-    httpSender1?.let { mShowMeDev.addSender(it) }
+//    httpSender1?.let { mShowMeDev.addSender(it) }
     mShowMeDev.addSender(httpSender2)
 
 //    mShowMeDev.cancelSenderWork(mShowMeDev.getSenderById("ID-02") as ShowMeHttpSender)
@@ -166,6 +168,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
     val logMsg = ShowMe().d(msg!!, watcherType = watcher, logType = logType)
     mShowMeDev.d(msg,logType, watcher)  //if you want to test Sender or Fileman
+    mShowMeDev.d("$msg-again",logType, watcher)  //if you want to test Sender or Fileman
     tv_log.append("\n$logMsg")
   }
 

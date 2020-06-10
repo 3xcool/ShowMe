@@ -1,6 +1,8 @@
 package com.example.showme.senders.api
 
 import android.util.Log
+import com.andrefilgs.fileman.auxiliar.orDefault
+import com.example.showme.LogcatType
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -17,21 +19,36 @@ internal class ShowMeHttp {
 
   companion object{
 
+    var showLogs:Boolean=false
+
     const val TIMEOUT :Int = 5000
     const val CONNECT_TIMEOUT : Int = 5000
     const val USE_CACHE = false
 
     private val TAG = "ShowMe-Http"
 
+    private fun log(logcatType: LogcatType?=LogcatType.VERBOSE, logContent:String, showLog:Boolean?=showLogs){
+      if(showLog.orDefault()){
+        when(logcatType){
+          LogcatType.VERBOSE -> Log.v(TAG, logContent)
+          LogcatType.DEBUG -> Log.d(TAG, logContent)
+          LogcatType.INFO -> Log.i(TAG, logContent)
+          LogcatType.WARNING -> Log.w(TAG, logContent)
+          LogcatType.ERROR -> Log.e(TAG, logContent)
+          else -> Log.v(TAG, logContent)
+        }
+      }
+    }
+
     /**
      * Return the new URL object from the given URL string
      */
-    fun createUrl(stringUrl: String?): URL? {
+    fun createUrl(stringUrl: String?, showLog: Boolean?=null): URL? {
       var url: URL? = null
       try {
         url = URL(stringUrl)
       } catch (e: MalformedURLException) {
-        Log.e(TAG, "Problem building the URL: ${e.message} ", e)
+        log(LogcatType.ERROR, "Problem building the URL: ${e.message}", showLog)
       }
       return url
     }
@@ -81,14 +98,16 @@ internal class ShowMeHttp {
     }
 
 
-    suspend fun makeRequestAsync(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?,readTimeout:Int?= TIMEOUT, connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE): Deferred<HttpResponse?> {
+    suspend fun makeRequestAsync(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT,
+                                 connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE, showLog: Boolean?=null): Deferred<HttpResponse?> {
       return GlobalScope.async {
-        makeRequest(mUrl, mMethod, mBody, mHeaders, readTimeout, connectTimeout, useCache)
+        makeRequest(mUrl, mMethod, mBody, mHeaders, readTimeout, connectTimeout, useCache, showLog)
       }
     }
 
     @Throws(Exception::class)
-    fun makeRequest(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT, connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE): HttpResponse? {
+    fun makeRequest(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT,
+                    connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE, showLog: Boolean?=null): HttpResponse? {
       val httpResponse = HttpResponse()
       val url: URL = createUrl(mUrl) ?: return null
 
@@ -116,6 +135,7 @@ internal class ShowMeHttp {
           os.write(mBody.toByteArray(charset("UTF-8")))
           os.close()
         }
+
         urlConnection.connect()
 
         //Headers Response
@@ -148,7 +168,7 @@ internal class ShowMeHttp {
           httpResponse.success = true
         }else{
           httpResponse.success = false
-          Log.w(TAG, "HTTP response code: " + urlConnection.responseCode)
+          log(LogcatType.WARNING, "HTTP response code: " + urlConnection.responseCode, showLog)
         }
       } catch (e: IOException) {
         Log.e(TAG, "Problem retrieving http answer due to: ${e.message}", e)
@@ -156,7 +176,7 @@ internal class ShowMeHttp {
         urlConnection?.disconnect()
         inputStream?.close()
       }
-      Log.d(TAG, "Url: ${urlConnection?.url}\nMethod: ${httpResponse.method}\nHttp Code = ${httpResponse.responseCode}\nBody Response: ${httpResponse.bodyResponse}\nBody Sent: ${httpResponse.bodySent}".trimIndent())
+      log(LogcatType.DEBUG, "Url: ${urlConnection?.url}\nMethod: ${httpResponse.method}\nHttp Code = ${httpResponse.responseCode}\nBody Response: ${httpResponse.bodyResponse}\nBody Sent: ${httpResponse.bodySent}".trimIndent(), showLog)
       return httpResponse
     }
 

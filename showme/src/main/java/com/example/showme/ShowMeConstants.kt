@@ -13,6 +13,7 @@ internal object ShowMeConstants {
   internal val KEY_HTTP_TIMEOUT = "KEY_HTTP_TIMEOUT"
   internal val KEY_HTTP_CONNECT_TIMEOUT = "KEY_HTTP_CONNECT_TIMEOUT"
   internal val KEY_HTTP_USE_CACHE = "KEY_HTTP_USE_CACHE"
+  internal val KEY_HTTP_SHOW_HTTP_LOGS = "KEY_HTTP_SHOW_HTTP_LOGS"
 
   var headers :MutableMap<String, String?>? = mutableMapOf()
 
