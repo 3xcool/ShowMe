@@ -16,15 +16,17 @@ object PlainTextConverter : Converters() {
 
 class GsonBodyConverter<T : Any>(
     private val gson: Gson,
-    private var pojoObj: T,
+    private var classType: Class<T>,
     private var logField:String?=null,
-    private var timestampField:String?=null
+    private var timestampField:String?=null,
+    private var listFieldsValue: Map<String, String?>?=null
+
 ) :Converters() {
 
 
   //  private val adapter: TypeAdapter<out Any>? = gson.getAdapter(TypeToken.get(type))
 
-  private val classType: Class<out T> = this.pojoObj::class.java
+//  private val classType: Class<out T> = this.pojoObj::class.java
 
 
   fun toJson(value: T): String? {
@@ -61,8 +63,18 @@ class GsonBodyConverter<T : Any>(
       val list = mutableListOf<Pair<String, Any?>>()
       list.add(Pair(logField ?: ShowMeAPILogModel::showMeLog.name, showMeLog))
       list.add(Pair(timestampField ?: ShowMeAPILogModel::timestamp.name, Utils.getNow()))
-      Utils.setFields(pojoObj as Any, list)
-      gson.toJson(pojoObj, classType)
+
+      listFieldsValue?.let {
+        for ((key, value) in listFieldsValue!!) {
+          try {
+            list.add(Pair(key, value))
+          }catch (e:Exception){
+          }
+        }
+      }
+      val temp = classType.newInstance()  //must create a new instance to avoid concurrency with multi thread
+      Utils.setFields(temp as Any, list)
+      gson.toJson(temp, classType)
 //      val res = gson.toJson(pojoObj, classType)
 //      Log.d("ShowMe-Gson", "End convert to Generic Json $res")
 //      res

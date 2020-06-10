@@ -225,7 +225,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   private fun prepareLogMsg(msg: String, logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg,
                             logId: Int = 0, logcatType: LogcatType?=defaultSummaryLogCatType, withTimePrefix:Boolean?=true): String? {
 
-    if(!isLoggable(mShowMeStatus, logType, watcherType)) return null
+//    if(!isLoggable(mShowMeStatus, logType, watcherType)) return null
 
     var outputMsg = if (wrapMsg!!) wrapMessage(msg) else msg
 
@@ -340,10 +340,11 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * @param addSummary -> Call showSummary() to see all logs stored as important
    * @param wrapMsg -> Wrap or not the Log Message
    * @param logId -> For Time Interval calculation by ID
-   * @param writeLog -> Granular control to write or not this specific log, even if this is Loggable
-   * @param sendLog -> Granular control to send or not this specific log, even if this is Loggable
+   * @param writeLog -> Granular control to write or not this specific log.
+   * @param sendLog -> Granular control to send or not this specific log, even if this is not Loggable
    * @param withTimePrefix -> if you want to enable/disable timePrefix. Best approach is to use setTimeIntervalStatus()
    */
+
   fun showMeLog(logcatType: LogcatType?=LogcatType.VERBOSE,
                 msg: String,
                 logType: LogType? = defaultLogType,
@@ -354,21 +355,45 @@ class ShowMe(var mShowMeStatus: Boolean = true,
                 writeLog:Boolean?=mWriteLog,
                 sendLog:Boolean?=mSendLog,
                 withTimePrefix: Boolean?=true): String {
-    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)?.let {
-      when (logcatType) {
-        LogcatType.VERBOSE -> Log.v(mShowMeTag , it)
-        LogcatType.DEBUG -> Log.d(mShowMeTag, it)
-        LogcatType.INFO -> Log.i(mShowMeTag, it)
-        LogcatType.WARNING -> Log.w(mShowMeTag, it)
-        LogcatType.ERROR -> Log.e(mShowMeTag, it)
-        LogcatType.NONE -> {} //do nothing
-      }
-      if (writeLog.orDefault()) writeLogFile(it)
+    //ShowMe user may want to send log to a server without showing it at Logcat, so...
 
-      if(sendLog.orDefault()) sendLog(it)
-      return it
+    if(mShowMeStatus){
+      val isLoggable = isLoggable(mShowMeStatus, logType, watcherType)
+      val showMeLog = prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)
+      showMeLog?.let {
+        if(isLoggable){
+          when (logcatType) {
+            LogcatType.VERBOSE -> Log.v(mShowMeTag , showMeLog)
+            LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
+            LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
+            LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
+            LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
+            LogcatType.NONE -> {} //do nothing
+          }
+          if (writeLog.orDefault()) writeLogFile(showMeLog)
+        }
+
+        if(sendLog.orDefault()) sendLog(it)  //send log if it is not loggable
+      }
+      return showMeLog ?: ""
     }
     return ""
+
+//    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)?.let {
+//      when (logcatType) {
+//        LogcatType.VERBOSE -> Log.v(mShowMeTag , it)
+//        LogcatType.DEBUG -> Log.d(mShowMeTag, it)
+//        LogcatType.INFO -> Log.i(mShowMeTag, it)
+//        LogcatType.WARNING -> Log.w(mShowMeTag, it)
+//        LogcatType.ERROR -> Log.e(mShowMeTag, it)
+//        LogcatType.NONE -> {} //do nothing
+//      }
+//      if (writeLog.orDefault()) writeLogFile(it)
+//
+//      if(sendLog.orDefault()) sendLog(it)
+//      return it
+//    }
+//    return ""
   }
 
 

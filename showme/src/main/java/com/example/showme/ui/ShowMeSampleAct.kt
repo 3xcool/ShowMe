@@ -67,8 +67,10 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
   private fun buildSender(){
 
 //    val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
-    val userAPIData = UserAPIModel(url = "www.showme.com", message = "some test", project = "andre")  //some user pojo object
-    val gsonConverter = GsonBodyConverter(Gson(), userAPIData, UserAPIModel::payload.name) //showMe logs will be add to payload field.
+
+    val listOfFieldsValues = mutableMapOf<String,String?>()
+    listOfFieldsValues[UserAPIModel::project.name] = "test"
+    val gsonConverter = GsonBodyConverter(Gson(), UserAPIModel::class.java, UserAPIModel::payload.name, UserAPIModel::timestamp.name, listOfFieldsValues) //showMe logs will be add to payload field.
 
     //CHANGE HERE
     val protocol = "http://"
@@ -83,6 +85,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     headers.put("Cache-Control", "no-cache")
     headers.put("Accept", "application/json")
     headers.put("Connection", "keep-alive")
+
 
     //Building first HTTP Sender
     val httpSender1 :Sender? = ShowMeHttpSender.Builder(this)
