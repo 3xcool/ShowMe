@@ -2,7 +2,6 @@ package com.example.showme.senders
 
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import com.andrefilgs.fileman.auxiliar.orDefault
 import com.example.showme.ShowMeConstants
@@ -74,7 +73,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
                         private var timeout:Int? = ShowMeHttp.TIMEOUT,
                         private var connectTimeout:Int? = ShowMeHttp.CONNECT_TIMEOUT,
                         private var useCache:Boolean? = ShowMeHttp.USE_CACHE,
-                        private var useWorkManager: Boolean?=false,
+                        private var useWorkManager: Boolean?=true,
                         private var showHttpLogs: Boolean?=false
                         ) : Sender(){
 
@@ -92,16 +91,6 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   override val name: String
     get() = ::ShowMeHttpSender.name
 
-  var lastWorkerId:Long=0L
-
-  private fun getWorkerID():Long{
-//    val now = Utils.getNow()
-//    val output =  if(now == lastWorkerId) now.plus(1L)  else now
-    val output:Long = lastWorkerId + 1
-    lastWorkerId = output
-    Log.d("ShowMe", "Worker ID: $output")
-    return output
-  }
 
   /**
    * User can call this fun besides ShowMe automatic sender calls
@@ -134,13 +123,9 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   //using WorkManager
   private fun sendLogWM(content:String, url:String?=mUrl ){
     baseCoroutineScope.launch(Dispatchers.Default) {
-//      val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
       val id = UUID.randomUUID().toString()
-      Log.d("ShowMe", "Worker ID: $id")
-      val httpRequest = buildHttpWorker(id, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
-
-      workManager.beginUniqueWork(id, ExistingWorkPolicy.APPEND, httpRequest).enqueue()
-//      workManager.beginWith( httpRequest).enqueue()
+      val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
+      workManager.beginUniqueWork(id, ExistingWorkPolicy.REPLACE, httpRequest).enqueue()
     }
   }
 
@@ -171,9 +156,6 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     inputData.putString(ShowMeConstants.KEY_HTTP_URL, url)
     inputData.putString(ShowMeConstants.KEY_HTTP_METHOD, method)
     inputData.putString(ShowMeConstants.KEY_HTTP_BODY, body)
-
-//    ShowMeConstants.logFifo.add(body)
-
     readTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_TIMEOUT, readTimeout)}
     connectTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, connectTimeout)}
     useCache?.let { inputData.putBoolean(ShowMeConstants.KEY_HTTP_USE_CACHE, useCache)}
