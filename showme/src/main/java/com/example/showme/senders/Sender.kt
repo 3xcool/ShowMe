@@ -13,8 +13,10 @@ import com.example.showme.senders.api.converters.Converters
 import com.example.showme.senders.api.converters.GsonBodyConverter
 import com.example.showme.senders.api.converters.PlainTextConverter
 import kotlinx.coroutines.*
+import java.util.*
 
 sealed class Sender {
+  abstract val id:String?
   abstract val name:String
   abstract var mActive:Boolean?
 
@@ -54,6 +56,7 @@ sealed class Sender {
 
 /**
  * @param mActive    -> Activate Sender
+ * @param id        -> Just for identification
  * @param mContext   -> For WorkManager
  * @param mProtocol  -> http://, https://
  * @param mHost      -> somehost.com/
@@ -62,23 +65,28 @@ sealed class Sender {
  * @param bodyConverter -> Send as PlainText or JSON. See Converters class for more info
  */
 class ShowMeHttpSender (override var mActive: Boolean?=null,
-                                 private var mContext: Context,
-                                 private var mHeaders: MutableMap<String,String?>?=null,
-                                 private var mProtocol: String?=null,
-                                 private var mHost: String?=null,
-                                 private var mPath:String?=null,
-                                 private var mArguments: MutableMap<String, String>?=null,
-                                 private var bodyConverter: Converters?= PlainTextConverter,
-                                 private var timeout:Int? = ShowMeHttp.TIMEOUT,
-                                 private var connectTimeout:Int? = ShowMeHttp.CONNECT_TIMEOUT,
-                                 private var useCache:Boolean? = ShowMeHttp.USE_CACHE) : Sender(){
+                        override val id: String?=UUID.randomUUID().toString(),
+                        private var mContext: Context,
+                        private var mHeaders: MutableMap<String,String?>?=null,
+                        private var mProtocol: String?=null,
+                        private var mHost: String?=null,
+                        private var mPath:String?=null,
+                        private var mArguments: MutableMap<String, String>?=null,
+                        private var bodyConverter: Converters?= PlainTextConverter,
+                        private var timeout:Int? = ShowMeHttp.TIMEOUT,
+                        private var connectTimeout:Int? = ShowMeHttp.CONNECT_TIMEOUT,
+                        private var useCache:Boolean? = ShowMeHttp.USE_CACHE,
+                        private var useWorkManager: Boolean?=false
+                        ) : Sender(){
 
 
 
   private var mUrl :String? = ShowMeHttp.buildUrl(mProtocol, mHost, mPath, mArguments)
   var mBodyConverter : Converters? = bodyConverter
 
-  private var workManager: WorkManager = WorkManager.getInstance(mContext)
+  var workManager: WorkManager = WorkManager.getInstance(mContext)
+
+
 
   override val name: String
     get() = ::ShowMeHttpSender.name
@@ -89,18 +97,22 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
    * Be careful because this fun is using "runBlocking", so it is a synchronous way.
    * It will call the API from Dispatchers.Default because it's using Coroutine under the hood
    */
-  fun sendLogSync(content:String, url:String?=mUrl ): HttpResponse? = runBlocking {
+  fun sendLogSync(content:String, url:String?= mUrl ): HttpResponse? = runBlocking {
     if(!isSenderActive()) return@runBlocking null
     sendLogAsync(content, url).await()
   }
 
-  internal fun sendLog(content:String, url:String?=mUrl ) = runBlocking {
+  internal fun sendLog(content:String, url:String?= mUrl ) = runBlocking {
     if(isSenderActive()){
-      sendLogWM(content, url)
+      if (useWorkManager.orDefault(false)){
+        sendLogWM(content, url)
+      }else{
+        sendLogLaunch(content, url)
+      }
     }
   }
 
-  private suspend fun sendLogAsync(content:String, url:String?=mUrl ): Deferred<HttpResponse?> {
+  private suspend fun sendLogAsync(content:String, url:String?= mUrl ): Deferred<HttpResponse?> {
     val res = GlobalScope.async(Dispatchers.Default) {
       ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache)
     }
@@ -113,6 +125,12 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     GlobalScope.launch(Dispatchers.Default) {
       val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache )
       workManager.beginUniqueWork(getNow().toString(), ExistingWorkPolicy.REPLACE, httpRequest).enqueue()
+    }
+  }
+
+  private fun sendLogLaunch(content:String, url:String?=mUrl ){
+    GlobalScope.launch(Dispatchers.Default) {
+      ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache)
     }
   }
 
@@ -155,6 +173,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   class Builder(private var context: Context){
 
     private var active: Boolean?=null
+    private var id: String?=null
     private var headers: MutableMap<String,String?> = mutableMapOf()
     private var protocol: String?=null
     private var host: String?=null
@@ -165,6 +184,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     private var readTimeout :Int? = null
     private var connectTimeout :Int? = null
     private var useCache :Boolean? = null
+    private var useWorkManager :Boolean? = false
 
     fun active(value:Boolean):Builder{
       this.active = value
@@ -177,6 +197,11 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
       this.path = path
       this.arguments = mArguments
       this.url = ShowMeHttp.buildUrl(protocol,host, path, mArguments)
+      return this
+    }
+
+    fun setId(value:String):Builder{
+      this.id = value
       return this
     }
 
@@ -209,6 +234,11 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
       return this
     }
 
+    fun setUseWorkManager(useWorkManager: Boolean?): Builder {
+      this.useWorkManager = useWorkManager
+      return this
+    }
+
     private fun validateBuilder():Boolean{
       //      checkNotNull(mUrl) { "url == null" }
       return this.url != null
@@ -216,7 +246,8 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
 
     fun build(): Sender? {
       return if(validateBuilder()){
-        ShowMeHttpSender(this.active, this.context, this.headers, this.protocol, this.host, this.path, this.arguments, this.bodyConverter )
+        ShowMeHttpSender(this.active,this.id, this.context, this.headers, this.protocol, this.host, this.path, this.arguments, this.bodyConverter,
+          this.readTimeout, this.connectTimeout, this.useCache, this.useWorkManager)
       }else{
         null
       }

@@ -518,7 +518,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
 
   //region ================ SENDER ================
 
-  private var mSenders: MutableList<Sender>?= mutableListOf()
+  var mSenders: MutableList<Sender>?= mutableListOf()
 
   /**
    * @param sender              -> HTTP Sender
@@ -527,10 +527,37 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     mSendLog = sender.mActive
     when(sender){
       is ShowMeHttpSender -> {
-        d("Building sender -> ${sender.getName}")
         mSenders?.add(sender)
       }
 //      else -> d("Sender ${sender.getName} not available ")
+    }
+  }
+
+  fun getSenderById(id:String): Sender? {
+    return mSenders?.firstOrNull {sender-> sender.id == id }
+  }
+
+  fun pruneSenderWork(sender: ShowMeHttpSender){
+    sender.workManager.pruneWork()
+  }
+
+  fun cancelSenderWork(sender: ShowMeHttpSender){
+    sender.workManager.cancelAllWork()
+  }
+
+  fun pruneAllWorks(){
+    mSenders?.forEach {sender->
+      if(sender is ShowMeHttpSender){
+        sender.workManager.pruneWork()
+      }
+    }
+  }
+
+  fun cancelAllWorks(){
+    mSenders?.forEach {sender->
+      if(sender is ShowMeHttpSender){
+        sender.workManager.cancelAllWork()
+      }
     }
   }
 

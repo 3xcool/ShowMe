@@ -82,32 +82,39 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     headers.put("application", "web-app-portal")
     headers.put("Cache-Control", "no-cache")
     headers.put("Accept", "application/json")
+    headers.put("Connection", "keep-alive")
 
     //Building first HTTP Sender
     val httpSender1 :Sender? = ShowMeHttpSender.Builder(this)
+      .setId("ID-01")  //you don't need to pass this value, default is using UUID to generate random ID
       .active(true)
       .addHeaders(headers)
       .buildUrl(protocol, host, path, null)
-      .addHeader("Connection", "keep-alive")
+//      .addHeader("Connection", "keep-alive")
 //      .setConverter(PlainTextConverter)
       .setConverter(gsonConverter)
       .setUseCache(true)
       .setReadTimeout(10000)
       .setConnectTimeout(10000)
+      .setUseWorkManager(true)
       .build()
 
     //You can also build like this
-    //    val httpSender1 = ShowMeHttpSender(false, headers, protocol, host, path)
-//    val httpSender1 = ShowMeHttpSender(false, headers, protocol, host, path, null, PlainTextConverter)
+//    val httpSender1 = ShowMeHttpSender(false,null, applicationContext, headers, protocol, host, path)
+//    val httpSender1 = ShowMeHttpSender(false,null, applicationContext ,headers, protocol, host, path, null, bodyConverter =  PlainTextConverter)
 
     //Building second HTTP Sender
-    val httpSender2 = ShowMeHttpSender(true, applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,true)
+    val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
     //Add Senders
     httpSender1?.let { mShowMeDev.addSender(it) }
     mShowMeDev.addSender(httpSender2)
+
+//    mShowMeDev.cancelSenderWork(mShowMeDev.getSenderById("ID-02") as ShowMeHttpSender)
+//    mShowMeDev.cancelAllWorks()
+//    mShowMeDev.pruneAllWorks()
   }
 
 
