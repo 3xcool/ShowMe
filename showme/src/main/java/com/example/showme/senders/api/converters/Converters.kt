@@ -13,7 +13,10 @@ sealed class Converters(){
 object PlainTextConverter : Converters() {
 }
 
-
+/**
+ * @param timestampField -> Pass field name as String but field must be Long (optional)
+ * @param listFieldsValue -> Pass some data to your json object besides showMe log and timestamp (optional)
+ */
 class GsonBodyConverter<T : Any>(
     private val gson: Gson,
     private var classType: Class<T>,

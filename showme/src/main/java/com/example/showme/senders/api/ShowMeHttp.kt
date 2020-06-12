@@ -27,6 +27,7 @@ internal class ShowMeHttp {
 
     private val TAG = "ShowMe-Http"
 
+    //todo 1000 add ShowMeLogger to entire ShowMe library
     private fun log(logcatType: LogcatType?=LogcatType.VERBOSE, logContent:String, showLog:Boolean?=showLogs){
       if(showLog.orDefault()){
         when(logcatType){

@@ -357,43 +357,29 @@ class ShowMe(var mShowMeStatus: Boolean = true,
                 withTimePrefix: Boolean?=true): String {
     //ShowMe user may want to send log to a server without showing it at Logcat, so...
 
-    if(mShowMeStatus){
-      val isLoggable = isLoggable(mShowMeStatus, logType, watcherType)
-      val showMeLog = prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)
-      showMeLog?.let {
-        if(isLoggable){
-          when (logcatType) {
-            LogcatType.VERBOSE -> Log.v(mShowMeTag , showMeLog)
-            LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
-            LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
-            LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
-            LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
-            LogcatType.NONE -> {} //do nothing
-          }
-          if (writeLog.orDefault()) writeLogFile(showMeLog)
-        }
 
-        if(sendLog.orDefault()) sendLog(it)  //send log if it is not loggable
+    val isLoggable = isLoggable(mShowMeStatus, logType, watcherType)
+    val showMeLog = prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)
+    showMeLog?.let {
+      if(isLoggable){
+        when (logcatType) {
+          LogcatType.VERBOSE -> Log.v(mShowMeTag , showMeLog)
+          LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
+          LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
+          LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
+          LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
+          LogcatType.NONE -> {} //do nothing
+        }
+        return showMeLog ?: ""
       }
-      return showMeLog ?: ""
+
+      if (writeLog.orDefault()) writeLogFile(showMeLog)  //write log even if it is not loggable
+
+      if(sendLog.orDefault()) sendLog(it)  //send log even if it is not loggable
     }
     return ""
 
-//    prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)?.let {
-//      when (logcatType) {
-//        LogcatType.VERBOSE -> Log.v(mShowMeTag , it)
-//        LogcatType.DEBUG -> Log.d(mShowMeTag, it)
-//        LogcatType.INFO -> Log.i(mShowMeTag, it)
-//        LogcatType.WARNING -> Log.w(mShowMeTag, it)
-//        LogcatType.ERROR -> Log.e(mShowMeTag, it)
-//        LogcatType.NONE -> {} //do nothing
-//      }
-//      if (writeLog.orDefault()) writeLogFile(it)
-//
-//      if(sendLog.orDefault()) sendLog(it)
-//      return it
-//    }
-//    return ""
+
   }
 
 
