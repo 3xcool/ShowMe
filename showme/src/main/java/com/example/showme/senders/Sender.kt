@@ -102,7 +102,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     sendLogAsync(content, url).await()
   }
 
-  internal fun sendLog(content:String, url:String?= mUrl ) = runBlocking {
+  internal suspend fun sendLog(content:String, url:String?= mUrl ) {
     if(isSenderActive()){
       if (useWorkManager.orDefault(false)){
         sendLogWM(content, url)
@@ -121,7 +121,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
 
 
   //using WorkManager
-  private fun sendLogWM(content:String, url:String?=mUrl ){
+  private suspend fun sendLogWM(content:String, url:String?=mUrl ){
     baseCoroutineScope.launch(Dispatchers.Default) {
       val id = UUID.randomUUID().toString()
       val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
@@ -129,7 +129,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     }
   }
 
-  private fun sendLogLaunch(content:String, url:String?=mUrl ){
+  private suspend fun sendLogLaunch(content:String, url:String?=mUrl ){
     baseCoroutineScope.launch(Dispatchers.Default) {
       ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs)
     }

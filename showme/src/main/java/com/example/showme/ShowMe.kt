@@ -12,6 +12,9 @@ import com.andrefilgs.fileman.workmanager.FilemanWM
 import com.example.showme.senders.Sender
 import com.example.showme.senders.ShowMeHttpSender
 import com.example.showme.utils.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.min
 
@@ -370,12 +373,13 @@ class ShowMe(var mShowMeStatus: Boolean = true,
           LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
           LogcatType.NONE -> {} //do nothing
         }
-        return showMeLog ?: ""
       }
 
       if (writeLog.orDefault()) writeLogFile(showMeLog)  //write log even if it is not loggable
 
       if(sendLog.orDefault()) sendLog(it)  //send log even if it is not loggable
+
+      return showMeLog
     }
     return ""
 
@@ -529,6 +533,8 @@ class ShowMe(var mShowMeStatus: Boolean = true,
 
   //region ================ SENDER ================
 
+  private val baseCoroutineScope = CoroutineScope(Dispatchers.Default)
+
   var mSenders: MutableList<Sender>?= mutableListOf()
 
   /**
@@ -577,10 +583,12 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   }
 
   private fun sendLog(logContent:String){
-    mSenders?.forEach {sender ->
-      if(isSenderAvailable(sender)){
-        when(sender){
-          is ShowMeHttpSender -> sender.sendLog(logContent)
+    baseCoroutineScope.launch(Dispatchers.Default) {
+      mSenders?.forEach {sender ->
+        if(isSenderAvailable(sender)){
+          when(sender){
+            is ShowMeHttpSender -> sender.sendLog(logContent)
+          }
         }
       }
     }
