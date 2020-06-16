@@ -91,14 +91,12 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val host = "showme.com.br/"
     val path = "v1/SomeAPI"
 
-
     val headers : MutableMap<String, String?> = mutableMapOf<String,String?>()
     headers.put("Content-Type", "application/json")
     headers.put("application", "manager-portal")
     headers.put("application", "web-app-portal")
     headers.put("Cache-Control", "no-cache")
     headers.put("Accept", "application/json")
-
 
 
     //Building first HTTP Sender
