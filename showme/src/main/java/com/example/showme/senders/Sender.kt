@@ -5,13 +5,11 @@ import android.content.Context
 import androidx.work.*
 import com.andrefilgs.fileman.auxiliar.orDefault
 import com.example.showme.const.ShowMeConstants
-import com.example.showme.senders.api.HTTP_METHODS
-import com.example.showme.senders.api.HttpResponse
-import com.example.showme.senders.api.HttpWorker
-import com.example.showme.senders.api.ShowMeHttp
+import com.example.showme.senders.api.*
 import com.example.showme.senders.api.converters.Converters
 import com.example.showme.senders.api.converters.GsonBodyConverter
 import com.example.showme.senders.api.converters.PlainTextConverter
+import com.example.showme.utils.Utils
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -83,7 +81,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   var mBodyConverter : Converters? = bodyConverter
 
   var workManager: WorkManager = WorkManager.getInstance(mContext)
-
+  var wmCounter:Int = 0 //for showMeWorkId
 
   private val baseCoroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -91,6 +89,11 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   override val name: String
     get() = ::ShowMeHttpSender.name
 
+
+  fun getShowMeWorkIDCounter(): Int {
+    wmCounter += 1
+    return wmCounter
+  }
 
   /**
    * User can call this fun besides ShowMe automatic sender calls
@@ -155,7 +158,12 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     inputData.putString(ShowMeConstants.KEY_HTTP_TAG, tag)
     inputData.putString(ShowMeConstants.KEY_HTTP_URL, url)
     inputData.putString(ShowMeConstants.KEY_HTTP_METHOD, method)
-    inputData.putString(ShowMeConstants.KEY_HTTP_BODY, body)
+
+//    inputData.putString(ShowMeConstants.KEY_HTTP_BODY, body) //USE DTO
+    val showMeKey = Utils.getNow().toString() + getShowMeWorkIDCounter()  //some random key to avoid collision
+    inputData.putString(ShowMeConstants.KEY_HTTP_SHOW_ME_ID, showMeKey)
+    WorkManagerDTO.putWorkContent(showMeKey, body)
+
     readTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_TIMEOUT, readTimeout)}
     connectTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, connectTimeout)}
     useCache?.let { inputData.putBoolean(ShowMeConstants.KEY_HTTP_USE_CACHE, useCache)}

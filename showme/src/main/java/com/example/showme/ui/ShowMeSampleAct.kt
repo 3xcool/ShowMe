@@ -87,10 +87,14 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val gsonConverter = GsonBodyConverter(Gson(), UserAPIModel::class.java, UserAPIModel::payload.name, UserAPIModel::timestamp.name, listOfFieldsValues) //showMe logs will be add to payload field.
 
     //CHANGE HERE
-    val protocol = "http://"
-    val host = "showme.com.br/"
-    val path = "v1/SomeAPI"
+//    val protocol = "http://"
+//    val host = "showme.com.br/"
+//    val path = "v1/SomeAPI"
 
+    val bearer: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMDE2OTQiLCJ1c2VyTmFtZSI6Ik9kZW5pbCBNZW5lZ2F0dG8iLCJ1c2VyRW1haWwiOiJvZGVuaWwubWVuZWdhdHRvQGJtZ2dyYW5pdG8uY29tLmJyIiwicGFydG5lcklkIjoiNjQiLCJjdXN0b21lcklkIjoiMCIsIm5iZiI6MTU3MDY0MDY0MCwiZXhwIjoxNzI2MTYwNjQwLCJpYXQiOjE1NzA2NDA2NDB9.bsoFRlFHgrExS4XS2zfVnJifJ_CONoW6stxp0N5z85Y"
+    val protocol = "http://"
+    val host = "pagocartoes.com.br:9008/"
+    val path = "stock/api/LibPayment/SaveLog"
 
     val headers : MutableMap<String, String?> = mutableMapOf<String,String?>()
     headers.put("Content-Type", "application/json")
@@ -98,6 +102,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     headers.put("application", "web-app-portal")
     headers.put("Cache-Control", "no-cache")
     headers.put("Accept", "application/json")
+    headers.put("Authorization", "Bearer " + bearer)
 
 
 

@@ -225,9 +225,11 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     //    skipLine()
   }
 
-  private fun isLoggable(showMeStatus:Boolean?=mShowMeStatus, logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType):Boolean{
-    if(showMeStatus == null || logType == null || watcherType == null) return false
-    if (!mShowMeStatus) return false
+
+  private fun isLoggable(logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType):Boolean{
+//    if(showMeStatus == null || logType == null || watcherType == null) return false
+    if(logType == null || watcherType == null) return false
+//    if (!mShowMeStatus) return false
     if (watcherType.type < mWatcherTypeMode.type) return false
     if (logType.type < mLogTypeMode.type) return false
     return true
@@ -281,10 +283,6 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     if (timePrefix.isNotEmpty()) timePrefix = "$timePrefix ║ "
 
     outputMsg = "$timePrefix$outputMsg"
-
-    if (addSummary!!){
-      summaryList.add(summaryList.size, Pair(logcatType ?:defaultSummaryLogCatType, outputMsg))
-    }
 
     mRelativeTimeInterval = ellapsedRealTime  //always updating last log time for relative time interval
 
@@ -370,24 +368,30 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     //ShowMe user may want to send log to a server without showing it at Logcat, so...
 
 
-    val isLoggable = isLoggable(mShowMeStatus, logType, watcherType)
+    val isLoggable = isLoggable(logType, watcherType)
     val showMeLog = prepareLogMsg(msg, logType, watcherType, addSummary, wrapMsg, logId,logcatType= logcatType, withTimePrefix = withTimePrefix)
     showMeLog?.let {
       if(isLoggable){
-        when (logcatType) {
-          LogcatType.VERBOSE -> Log.v(mShowMeTag , showMeLog)
-          LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
-          LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
-          LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
-          LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
-          LogcatType.NONE -> {} //do nothing
+        if(mShowMeStatus.orDefault()){
+          when (logcatType) {
+            LogcatType.VERBOSE -> Log.v(mShowMeTag , showMeLog)
+            LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
+            LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
+            LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
+            LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
+            LogcatType.NONE -> {} //do nothing
+          }
+
+          if (addSummary!!){
+            summaryList.add(summaryList.size, Pair(logcatType ?:defaultSummaryLogCatType, it))
+          }
         }
+
+        if (writeLog.orDefault()) writeLogFile(showMeLog)  //write log even if it is not loggable
+
+        if(sendLog.orDefault()) sendLog(it)  //send log even if it is not loggable
+
       }
-
-      if (writeLog.orDefault()) writeLogFile(showMeLog)  //write log even if it is not loggable
-
-      if(sendLog.orDefault()) sendLog(it)  //send log even if it is not loggable
-
       return showMeLog
     }
     return ""

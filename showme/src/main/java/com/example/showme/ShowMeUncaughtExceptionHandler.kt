@@ -25,7 +25,7 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
 
   fun checkUEHExists(): Boolean {
     return if (getUEHcontent() != null) {
-      ShowMeLogger.log("❌ ATTENTION: Check Uncaught Error Handler file -> $filename. Delete file if this error is already known", LogcatType.WARNING, null)
+      ShowMeLogger.log("⛔ ATTENTION: Check Uncaught Error Handler file -> $filename. Delete file if this error is already known", LogcatType.WARNING, null)
       true
     } else {
       false
