@@ -6,10 +6,12 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.andrefilgs.fileman.FilemanDrivers
-import com.example.showme.LogType
 import com.example.showme.LogcatType
 import com.example.showme.ShowMe
-import com.example.showme.WatcherType
+import com.example.showme.ShowMeLogger
+import com.example.showme.ShowMeUncaughtExceptionHandler
+import com.example.showme.const.LogType
+import com.example.showme.const.WatcherType
 import com.example.showme.senders.Sender
 import com.example.showme.senders.ShowMeHttpSender
 import com.example.showme.senders.api.converters.GsonBodyConverter
@@ -22,6 +24,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
   private lateinit var mShowMeProduction : ShowMe
   private lateinit var mShowMeDev : ShowMe
+  private lateinit var ueh : ShowMeUncaughtExceptionHandler
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -29,15 +32,26 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     buildShowMe()
     setSpinners()
     setClickListeners()
+
+    //Crash Report for unhandled errors
+    val extraInfo = mapOf<String, String>(Pair("some key", "some value"))
+    ueh = ShowMeUncaughtExceptionHandler(this, "UEH_test_file", true, extraInfo )  //set addNewline to true for adding "\n" after each line read (default is true)
+    Thread.setDefaultUncaughtExceptionHandler(ueh)
   }
 
 
   private fun buildShowMe(){
+    //If you want to see ShowMe internal logs, by default they are disable
+    //    ShowMeLogger.disableLogs()
+    ShowMeLogger.enableLogs()
+
     //Don't use mShowTimeInterval parameter. Use setTimeIntervalStatus()
     mShowMeDev = ShowMe(true, "ShowMe", LogType.DEBUG, WatcherType.DEV)
 //    mShowMeDev.setTimeIntervalStatus(false, false, true, true)
+//    val ueh = mShowMeDev.createUncaughtExceptionHandler(this, "foo")  //use application context here
 
-    mShowMeProduction = ShowMe(true, "ShowMe", LogType.WARNING, WatcherType.PUBLIC, mShowTimeInterval = false)
+
+    mShowMeProduction = ShowMe(true, "ShowMe", LogType.WARNING, WatcherType.PUBLIC)
     mShowMeProduction.setTimeIntervalStatus(true, true, true, true)
 
 
@@ -61,8 +75,8 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
   //You can send ShowMe logs to a server using Sender (for now we only have one type -> ShowMeHttpSender)
   //I've no intention to add or replace any powerful REST API library inside ShowMe, so I'm using a simple barebone Http solution (please see ShowMeHttp).
-  //You can send a Plain Text or JSON in HTTP Body. By using JSON you can send as ShowMeAPILogModel or any other model that you desire.
-  //I'm using GSON library for JSON serialization because is the most used one. In the future I will add more options.
+  //You can send a Plain Text or JSON in HTTP Body. By using JSON you can send as ShowMeAPILogModel or any other model that you desire (using UserAPIModel as an example).
+  //ShowMe is using GSON library for JSON serialization because is the most used one. In the future I will add more options.
   //Just be aware that using your custom object requires Kotlin Reflection (see GsonBodyConverter -> convertToJson)
   private fun buildSender(){
 
@@ -73,14 +87,9 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val gsonConverter = GsonBodyConverter(Gson(), UserAPIModel::class.java, UserAPIModel::payload.name, UserAPIModel::timestamp.name, listOfFieldsValues) //showMe logs will be add to payload field.
 
     //CHANGE HERE
-//    val protocol = "http://"
-//    val host = "showme.com.br/"
-//    val path = "v1/SomeAPI"
-
-    val bearer: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMDE2OTQiLCJ1c2VyTmFtZSI6Ik9kZW5pbCBNZW5lZ2F0dG8iLCJ1c2VyRW1haWwiOiJvZGVuaWwubWVuZWdhdHRvQGJtZ2dyYW5pdG8uY29tLmJyIiwicGFydG5lcklkIjoiNjQiLCJjdXN0b21lcklkIjoiMCIsIm5iZiI6MTU3MDY0MDY0MCwiZXhwIjoxNzI2MTYwNjQwLCJpYXQiOjE1NzA2NDA2NDB9.bsoFRlFHgrExS4XS2zfVnJifJ_CONoW6stxp0N5z85Y"
     val protocol = "http://"
-    val host = "pagocartoes.com.br:9008/"
-    val path = "stock/api/LibPayment/SaveLog"
+    val host = "showme.com.br/"
+    val path = "v1/SomeAPI"
 
 
     val headers : MutableMap<String, String?> = mutableMapOf<String,String?>()
@@ -89,8 +98,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     headers.put("application", "web-app-portal")
     headers.put("Cache-Control", "no-cache")
     headers.put("Accept", "application/json")
-    headers.put("Connection", "keep-alive")
-    headers.put("Authorization", "Bearer " + bearer)
+
 
 
     //Building first HTTP Sender
@@ -120,9 +128,10 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
     //Add Senders
-    httpSender1?.let { mShowMeDev.addSender(it) }
+//    httpSender1?.let { mShowMeDev.addSender(it) }
     mShowMeDev.addSender(httpSender2)
 
+    //some extra fun (I hope you don't need to use them)
 //    mShowMeDev.cancelSenderWork(mShowMeDev.getSenderById("ID-02") as ShowMeHttpSender)
 //    mShowMeDev.cancelAllWorks()
 //    mShowMeDev.pruneAllWorks()
@@ -154,6 +163,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
   private fun setClickListeners() {
     btn_clear.setOnClickListener {
       tv_log.text = "Log"
+      ueh.deleteUEHfile()
     }
 
     btn_example.setOnClickListener {
@@ -166,6 +176,20 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
     btn_read_log.setOnClickListener {
       tv_log.text = mShowMeDev.readLogFile() ?: "File is empty"
+    }
+
+    btn_get_ueh_file.setOnClickListener {
+      val uehContent = ueh.getUEHcontent()
+      tv_log.text = uehContent ?: "File is empty"
+
+      uehContent?.let{
+        mShowMeDev.d(uehContent)
+//        mShowMeDev.sendContent(it)  //if you just want to send to server
+      }
+    }
+
+    btn_throw_ueh.setOnClickListener {
+      throw Exception("Some test error")
     }
 
   }

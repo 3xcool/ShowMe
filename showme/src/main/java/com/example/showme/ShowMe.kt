@@ -2,6 +2,7 @@ package com.example.showme
 
 
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.andrefilgs.fileman.Fileman
@@ -9,6 +10,8 @@ import com.andrefilgs.fileman.FilemanDrivers
 import com.andrefilgs.fileman.auxiliar.FilemanLogger
 import com.andrefilgs.fileman.auxiliar.orDefault
 import com.andrefilgs.fileman.workmanager.FilemanWM
+import com.example.showme.const.LogType
+import com.example.showme.const.WatcherType
 import com.example.showme.senders.Sender
 import com.example.showme.senders.ShowMeHttpSender
 import com.example.showme.utils.Utils
@@ -45,9 +48,7 @@ import kotlin.math.min
 class ShowMe(var mShowMeStatus: Boolean = true,
              var mTAG: String = "ShowMe",
              private val mLogTypeMode: LogType = LogType.DEBUG,
-             private val mWatcherTypeMode: WatcherType = WatcherType.DEV,
-             @Deprecated("Use setTimeIntervalStatus() to control the 4 types of Time Interval", replaceWith = ReplaceWith("setTimeIntervalStatus()"))
-             private val mShowTimeInterval: Boolean = false) {
+             private val mWatcherTypeMode: WatcherType = WatcherType.DEV) {
 
   //region local variables
   private val MAX_LOG_LENGTH = 4000
@@ -88,8 +89,9 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   var mCurrentTimeActive: Boolean = false             //this will be useful for storing log in a file or server.
   var mAbsoluteTimeIntervalActive: Boolean = false
   var mRelativeTimeIntervalActive: Boolean = false
-  var mRelativeByIdTimeIntervalActive: Boolean = mShowTimeInterval  //to be backward compatible
-  var mCurrentTime = getNow()
+  var mRelativeByIdTimeIntervalActive: Boolean = false  //to be backward compatible
+//  var mCurrentTime = getNow()
+  var mCurrentTime = getEllapsedRealTime()
   var mAbsoluteTimeInterval: Long = mCurrentTime                 //time difference between now and begin (startLog())
   var mRelativeTimeInterval: Long = mCurrentTime                 //time difference between now and last log
   private var mLogsId: MutableMap<Int, Long> =
@@ -176,11 +178,17 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     return System.currentTimeMillis()
   }
 
+  //https://sangsoonam.github.io/2017/03/01/do-not-use-curenttimemillis-for-time-interval.html
+  private fun getEllapsedRealTime():Long{
+    return SystemClock.elapsedRealtime()
+  }
+
   /**
    * Start log timer for time interval control
    */
   fun startLog() {
-    val now = getNow()
+//    val now = getNow()
+    val now = getEllapsedRealTime()
     mAbsoluteTimeInterval = now
     mRelativeTimeInterval = now
     mLogsId.clear()
@@ -245,24 +253,25 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     }
 
     var timePrefix = ""
-    val currentTime = getNow()
+    val currentTime = getNow() //to get current time
+    val ellapsedRealTime = getEllapsedRealTime()  //for time interval
 
     if(withTimePrefix.orDefault(true)){
       if (mCurrentTimeActive.orDefault()) timePrefix = "now:${Utils.convertTime(currentTime, Utils.getNowFormat())}"
 
       if (mAbsoluteTimeIntervalActive.orDefault()) {
-        val absoluteTime = currentTime - mAbsoluteTimeInterval
+        val absoluteTime = ellapsedRealTime - mAbsoluteTimeInterval
         timePrefix = "${addTimeDelimiter(timePrefix)}abs:${Utils.convertToSeconds(absoluteTime, mPrecisionAbsoluteTime)}"
       }
 
       if (mRelativeTimeIntervalActive.orDefault()) {
-        val relativeTime = currentTime - mRelativeTimeInterval
+        val relativeTime = ellapsedRealTime - mRelativeTimeInterval
         timePrefix = "${addTimeDelimiter(timePrefix)}rel:${Utils.convertToMilliseconds(relativeTime, mPrecisionRelativeTime)}"
       }
 
       if (mRelativeByIdTimeIntervalActive.orDefault()) {
-        val interval = currentTime - (mLogsId[logId] ?: currentTime)
-        mLogsId[logId] = currentTime  //update last time
+        val interval = ellapsedRealTime - (mLogsId[logId] ?: ellapsedRealTime)
+        mLogsId[logId] = ellapsedRealTime  //update last time
         //      timePrefix = "${addTimeDelimiter(timePrefix)}ID:$showMeId-rel:${Utils.convertTime(interval, Utils.getMilliseconds())}"
         timePrefix = "${addTimeDelimiter(timePrefix)}ID:$logId-rel:${Utils.convertToMilliseconds(interval, mPrecisionRelativeByIdTime)}"
       }
@@ -277,7 +286,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
       summaryList.add(summaryList.size, Pair(logcatType ?:defaultSummaryLogCatType, outputMsg))
     }
 
-    mRelativeTimeInterval = currentTime  //always updating last log time for relative time interval
+    mRelativeTimeInterval = ellapsedRealTime  //always updating last log time for relative time interval
 
     return outputMsg
   }
@@ -399,30 +408,30 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * @param sendLog -> Granular control to send or not this specific log, even if this is Loggable
    */
   fun d(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-      writeLog:Boolean?=mWriteLog,sendLog:Boolean?=mSendLog): String {
+        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
     return showMeLog(LogcatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
   fun i(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog,sendLog:Boolean?=mSendLog): String {
+        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
     return showMeLog(LogcatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
   fun w(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog,sendLog:Boolean?=mSendLog): String {
+        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
     return showMeLog(LogcatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
   fun e(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog,sendLog:Boolean?=mSendLog): String {
+        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
     return showMeLog(LogcatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
   fun v(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog,sendLog:Boolean?=mSendLog): String {
+        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
     return showMeLog(LogcatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
@@ -595,7 +604,21 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   }
 
 
+  /**
+   * User can send some content to a server using ShowMeHttpSender
+   */
+  fun sendContent(content:String){
+    baseCoroutineScope.launch(Dispatchers.Default) {
+      mSenders?.forEach {sender ->
+        if(sender is ShowMeHttpSender) sender.sendLog(content)
+      }
+    }
+  }
+
+
   //endregion
+
+
 }
 
 

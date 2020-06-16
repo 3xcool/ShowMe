@@ -27,7 +27,7 @@ internal class ShowMeHttp {
 
     private val TAG = "ShowMe-Http"
 
-    //todo 1000 add ShowMeLogger to entire ShowMe library
+
     private fun log(logcatType: LogcatType?=LogcatType.VERBOSE, logContent:String, showLog:Boolean?=showLogs){
       if(showLog.orDefault()){
         when(logcatType){
@@ -99,7 +99,7 @@ internal class ShowMeHttp {
     }
 
 
-    suspend fun makeRequestAsync(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT,
+    fun makeRequestAsync(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT,
                                  connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE, showLog: Boolean?=null): Deferred<HttpResponse?> {
       return GlobalScope.async {
         makeRequest(mUrl, mMethod, mBody, mHeaders, readTimeout, connectTimeout, useCache, showLog)
@@ -172,7 +172,7 @@ internal class ShowMeHttp {
           log(LogcatType.WARNING, "HTTP response code: " + urlConnection.responseCode, showLog)
         }
       } catch (e: IOException) {
-        Log.e(TAG, "Problem retrieving http answer due to: ${e.message}", e)
+        log(LogcatType.ERROR, "Problem retrieving http answer due to: ${e.message}", showLog)
       } finally {
         urlConnection?.disconnect()
         inputStream?.close()

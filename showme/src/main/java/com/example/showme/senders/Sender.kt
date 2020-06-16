@@ -4,7 +4,7 @@ package com.example.showme.senders
 import android.content.Context
 import androidx.work.*
 import com.andrefilgs.fileman.auxiliar.orDefault
-import com.example.showme.ShowMeConstants
+import com.example.showme.const.ShowMeConstants
 import com.example.showme.senders.api.HTTP_METHODS
 import com.example.showme.senders.api.HttpResponse
 import com.example.showme.senders.api.HttpWorker
@@ -112,7 +112,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     }
   }
 
-  private suspend fun sendLogAsync(content:String, url:String?= mUrl ): Deferred<HttpResponse?> {
+  private fun sendLogAsync(content:String, url:String?= mUrl ): Deferred<HttpResponse?> {
     val res = baseCoroutineScope.async(Dispatchers.Default) {
       ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs)
     }
@@ -121,7 +121,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
 
 
   //using WorkManager
-  private suspend fun sendLogWM(content:String, url:String?=mUrl ){
+  private fun sendLogWM(content:String, url:String?=mUrl ){
     baseCoroutineScope.launch(Dispatchers.Default) {
       val id = UUID.randomUUID().toString()
       val httpRequest = buildHttpWorker(ShowMeConstants.WORKER_TAG_HTTP, url, HTTP_METHODS.POST.type, convertBody(content)?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs )
@@ -129,7 +129,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     }
   }
 
-  private suspend fun sendLogLaunch(content:String, url:String?=mUrl ){
+  private fun sendLogLaunch(content:String, url:String?=mUrl ){
     baseCoroutineScope.launch(Dispatchers.Default) {
       ShowMeHttp.makeRequest( url, HTTP_METHODS.POST.type, convertBody(content) ?: content, mHeaders, timeout, connectTimeout, useCache, showHttpLogs)
     }

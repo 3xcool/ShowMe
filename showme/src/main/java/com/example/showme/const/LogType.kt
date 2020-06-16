@@ -1,4 +1,4 @@
-package com.example.showme
+package com.example.showme.const
 
 enum class LogType(val type: Int) {
     @Deprecated("use Verbose instead", replaceWith = ReplaceWith("VERBOSE"))

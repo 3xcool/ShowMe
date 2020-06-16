@@ -26,6 +26,8 @@ class GsonBodyConverter<T : Any>(
 
 ) :Converters() {
 
+  private val TAG = "ShowMe-GsonBodyConverter"
+
 
   //  private val adapter: TypeAdapter<out Any>? = gson.getAdapter(TypeToken.get(type))
 
@@ -56,13 +58,13 @@ class GsonBodyConverter<T : Any>(
   fun convertToJson(showMeLog: String): String? {
     return try {
       if(classType.name == ShowMeAPILogModel::class.java.name){
-//        Log.d("ShowMe-Gson", "Start convert to ShowMe Json $showMeLog")
+//        Log.d(TAG, "Start convert to ShowMe Json $showMeLog")
         val res = gson.toJson(ShowMeAPILogModel(showMeLog = showMeLog), ShowMeAPILogModel::class.java)
-//        Log.d("ShowMe-Gson", "End convert to ShowMe Json $res'")
+//        Log.d(TAG, "End convert to ShowMe Json $res'")
         return res
       }
 
-//      Log.d("ShowMe-Gson", "Start convert to Generic Json $showMeLog")
+//      Log.d(TAG, "Start convert to Generic Json $showMeLog")
       val list = mutableListOf<Pair<String, Any?>>()
       list.add(Pair(logField ?: ShowMeAPILogModel::showMeLog.name, showMeLog))
       list.add(Pair(timestampField ?: ShowMeAPILogModel::timestamp.name, Utils.getNow()))
@@ -79,7 +81,7 @@ class GsonBodyConverter<T : Any>(
       Utils.setFields(temp as Any, list)
       gson.toJson(temp, classType)
 //      val res = gson.toJson(pojoObj, classType)
-//      Log.d("ShowMe-Gson", "End convert to Generic Json $res")
+//      Log.d(TAG, "End convert to Generic Json $res")
 //      res
     }catch (e:Exception){
       null
@@ -91,13 +93,13 @@ class GsonBodyConverter<T : Any>(
 //  fun convertToJsonGenericReflectionOld(showMeLog: String): String? {
 //    return try {
 //      if(classType.name == ShowMeAPILogModel::class.java.name){
-//        //        Log.d("ShowMe-Gson", "Start convert to ShowMe Json $showMeLog")
+//        //        Log.d(TAG, "Start convert to ShowMe Json $showMeLog")
 //        val res = gson.toJson(ShowMeAPILogModel(showMeLog = showMeLog), ShowMeAPILogModel::class.java)
-//        //        Log.d("ShowMe-Gson", "End convert to ShowMe Json $res'")
+//        //        Log.d(TAG, "End convert to ShowMe Json $res'")
 //        return res
 //      }
 //
-//      //      Log.d("ShowMe-Gson", "Start convert to Generic Json $showMeLog")
+//      //      Log.d(TAG, "Start convert to Generic Json $showMeLog")
 //      val apiObj = classType.newInstance()
 //      val list = mutableListOf<Pair<String, Any?>>()
 //      list.add(Pair(logField?: "showMeLog", showMeLog))
@@ -105,7 +107,7 @@ class GsonBodyConverter<T : Any>(
 //      Utils.setFields(apiObj as Any, list)
 //      gson.toJson(apiObj, classType)
 //      //      val res = gson.toJson(apiObj, classType)
-//      //      Log.d("ShowMe-Gson", "End convert to Generic Json $res")
+//      //      Log.d(TAG, "End convert to Generic Json $res")
 //      //      res
 //    }catch (e:Exception){
 //      null

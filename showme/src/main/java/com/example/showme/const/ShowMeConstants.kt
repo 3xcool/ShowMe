@@ -1,4 +1,4 @@
-package com.example.showme
+package com.example.showme.const
 
 internal object ShowMeConstants {
 
@@ -16,5 +16,7 @@ internal object ShowMeConstants {
   internal val KEY_HTTP_SHOW_HTTP_LOGS = "KEY_HTTP_SHOW_HTTP_LOGS"
 
   var headers :MutableMap<String, String?>? = mutableMapOf()
+
+
 
 }

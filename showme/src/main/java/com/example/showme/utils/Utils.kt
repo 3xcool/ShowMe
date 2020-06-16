@@ -1,8 +1,9 @@
 package com.example.showme.utils
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
+import com.example.showme.LogcatType
+import com.example.showme.ShowMeLogger
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.reflect.KMutableProperty
@@ -73,7 +74,7 @@ class Utils() {
         var n = if (codePoint <= 0xFFFF) 4 else 5
 
 //        System.out.printf("%-${n}c  %-35s  U+%05X  ", codePoint, Character.getName(codePoint), codePoint)
-        Log.d("ShowMe" , java.lang.String.format("%-${n}c  %-35s  U+%05X  ", codePoint, Character.getName(codePoint), codePoint))
+        ShowMeLogger.log(java.lang.String.format("%-${n}c  %-35s  U+%05X  ", codePoint, Character.getName(codePoint), codePoint), LogcatType.ERROR, null)
 
         val bytes = utf8Encode(codePoint)
         var s = ""
@@ -82,7 +83,7 @@ class Utils() {
         n = if (decoded.toInt() <= 0xFFFF) 12 else 11
 //        System.out.printf("%-${n}s  %c\n", s, decoded)
 
-        Log.d("ShowMe" , java.lang.String.format("%-${n}s  %c\n", s, decoded))
+        ShowMeLogger.log(java.lang.String.format("%-${n}s  %c\n", s, decoded), LogcatType.ERROR, null)
       }
     }
 
@@ -94,7 +95,7 @@ class Utils() {
         sb.append(java.lang.String.format("%c", decoded).toString())
       }
 //      Logger.debugEntire(sb.toString())
-      Log.d("ShowMe" , sb.toString())
+      ShowMeLogger.log(sb.toString(), LogcatType.ERROR, null)
     }
 
     fun generateAllUtfChars(){

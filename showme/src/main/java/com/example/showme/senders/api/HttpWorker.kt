@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.andrefilgs.fileman.auxiliar.orDefault
-import com.example.showme.ShowMeConstants
+import com.example.showme.const.ShowMeConstants
 import kotlinx.coroutines.coroutineScope
 
 internal class HttpWorker(appContext: Context, workerParams: WorkerParameters)
