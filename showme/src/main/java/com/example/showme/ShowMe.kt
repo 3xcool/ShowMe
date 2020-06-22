@@ -316,10 +316,10 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     val botL = "╚"
     val botR = "╝"
     //Only for LogCat clean view
-    showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR", addSummary = false, writeLog = false, sendLog = false)
+    showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR",logType, watcherType, addSummary = false, writeLog = false, sendLog = false)
     showMeLog(logcatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, logId = logId, writeLog = false, sendLog = false)
-    showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR", addSummary = false, writeLog = false, sendLog = false)
-    return showMeLog(LogcatType.NONE, msg.toUpperCase(Locale.ROOT), logType, watcherType, addSummary, logId= logId, writeLog = writeLog, sendLog = sendLog)   //main title ShowMe log
+    showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR",logType, watcherType, addSummary = false, writeLog = false, sendLog = false)
+    return showMeLog(LogcatType.NONE, msg.toUpperCase(Locale.ROOT), logType, watcherType, addSummary, logId= logId, writeLog = writeLog, sendLog = sendLog)   //NONE will not print in Logcat
   }
 
   fun skipLine(qty: Int = skipLineQty, repeatableChar: String = skipLineRepeatableChar, repeatQty: Int = skipLineRepeatableCharQty, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType?=defaultGeneralLogCatType) {
@@ -472,8 +472,8 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * @param useWorkManager -> Activate this if you want to use WorkManager + Coroutine for writing file
    * @param viewLifecycleOwner -> To get WorkManager liveData observe output
    */
-  fun initFileman(showFilemanLog: Boolean? = false, context: Context, drive: Int?, folder: String?, filename: String?, append: Boolean?, useWorkManager: Boolean? = false, viewLifecycleOwner: LifecycleOwner? = null): Boolean {
-    mWriteLog = true
+  fun addFileman(filemanActive:Boolean, showFilemanLog: Boolean? = false, context: Context, drive: Int?, folder: String?, filename: String?, append: Boolean?, useWorkManager: Boolean? = false, viewLifecycleOwner: LifecycleOwner? = null): Boolean {
+    mWriteLog = filemanActive
     useWorkManager?.let { mUseWorkManager = it }
     drive?.let { if (it <= FilemanDrivers.values().size) SHOWME_DRIVE = it }
     folder?.let { SHOWME_FOLDER = it }
@@ -494,10 +494,6 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   }
 
 
-  @Deprecated("For better semantic, use initFileman()", replaceWith = ReplaceWith("initFileman()"))
-  fun buildFileman(showFilemanLog: Boolean? = mShowMeStatus, context: Context, drive: Int?, folder: String?, filename: String?, append: Boolean?, useWorkManager: Boolean? = false, viewLifecycleOwner: LifecycleOwner? = null): Boolean {
-    return initFileman(showFilemanLog, context, drive, folder, filename, append, useWorkManager, viewLifecycleOwner)
-  }
 
   private fun isFilemanAvailable(): Boolean {
     return if (!mUseWorkManager.orDefault(false)) {

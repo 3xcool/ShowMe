@@ -3,8 +3,8 @@ package com.example.showme.const
 
 
 enum class WatcherType(val type: Int) {
-    DEV(0),         //only developer can see
+    PUBLIC(2),       //anyone can see
     GUEST(1),       //only developer and guest can see
-    PUBLIC(2)       //anyone can see
+    DEV(0),         //only developer can see
 }
 

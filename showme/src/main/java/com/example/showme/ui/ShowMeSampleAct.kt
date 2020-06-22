@@ -19,7 +19,7 @@ import com.example.showme.senders.api.model.UserAPIModel
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_show_me_sample.*
 
-
+//ATTENTION: Put your Logcat at Verbose mode to see all logs
 class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
   private lateinit var mShowMeProduction : ShowMe
@@ -56,7 +56,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
 
     //use Fileman for writing logs
-    mShowMeDev.initFileman(false, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true)
+    mShowMeDev.addFileman(true,false, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true)
 
     //If you want to use WorkManager + Coroutine for writing files and observe LiveData response
     //    mShowMeDev.buildFileman(true, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true, useWorkManager = true, viewLifecycleOwner = this)
@@ -120,8 +120,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val httpSender1 = ShowMeHttpSender(false,null, applicationContext ,headers, protocol, host, path, null, bodyConverter =  PlainTextConverter)
 
     //Building second HTTP Sender
-    val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,
-      10000,10000,false, true, true)
+    val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,false, true, true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
