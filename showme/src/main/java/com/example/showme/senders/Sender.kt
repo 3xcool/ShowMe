@@ -263,7 +263,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
 
     fun build(): Sender? {
       return if(validateBuilder()){
-        ShowMeHttpSender(this.active,this.id, this.context, this.headers, this.protocol, this.host, this.path, this.arguments, this.bodyConverter,
+        ShowMeHttpSender(this.active,this.id ?: UUID.randomUUID().toString(), this.context, this.headers, this.protocol, this.host, this.path, this.arguments, this.bodyConverter,
           this.readTimeout, this.connectTimeout, this.useCache, this.useWorkManager, this.showHttpLogs)
       }else{
         null

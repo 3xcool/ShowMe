@@ -316,9 +316,9 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     val botL = "╚"
     val botR = "╝"
     //Only for LogCat clean view
-    showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR",logType, watcherType, addSummary = false, writeLog = false, sendLog = false)
+    showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR",logType, watcherType, addSummary = false,logId = logId, writeLog = false, sendLog = false)
     showMeLog(logcatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, logId = logId, writeLog = false, sendLog = false)
-    showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR",logType, watcherType, addSummary = false, writeLog = false, sendLog = false)
+    showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR",logType, watcherType, addSummary = false,logId = logId, writeLog = false, sendLog = false)
     return showMeLog(LogcatType.NONE, msg.toUpperCase(Locale.ROOT), logType, watcherType, addSummary, logId= logId, writeLog = writeLog, sendLog = sendLog)   //NONE will not print in Logcat
   }
 

@@ -137,8 +137,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="Crash App"
+                android:text="Throw Error"
                 app:layout_constraintStart_toEndOf="@id/btn_get_ueh_file"
+                app:layout_constraintEnd_toStartOf="@+id/btn_throw_ueh_crash"
+                app:layout_constraintTop_toTopOf="@+id/btn_get_ueh_file" />
+
+        <Button
+                android:id="@+id/btn_throw_ueh_crash"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Crash App"
+                app:layout_constraintStart_toEndOf="@id/btn_throw_ueh"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/btn_get_ueh_file" />
 

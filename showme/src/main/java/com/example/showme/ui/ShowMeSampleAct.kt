@@ -157,6 +157,8 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     //do nothing
   }
 
+  private lateinit var someException:String
+
   private fun setClickListeners() {
     btn_clear.setOnClickListener {
       tv_log.text = "Log"
@@ -187,6 +189,10 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
     btn_throw_ueh.setOnClickListener {
       throw Exception("Some test error")
+    }
+
+    btn_throw_ueh_crash.setOnClickListener {
+      tv_log.text = someException
     }
 
   }

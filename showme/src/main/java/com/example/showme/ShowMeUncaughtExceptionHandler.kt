@@ -48,21 +48,50 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
     sb.append("Class Name: $className\n")
     sb.append("Class Method: $method\n")
     sb.append("Class Line: $line\n\n")
-    sb.append("App ID: " + BuildConfig.APPLICATION_ID + "\n")
-    sb.append("Version Code: " + BuildConfig.VERSION_CODE + "\n")
-    sb.append("Version Name: " + BuildConfig.VERSION_NAME + "\n")
-    sb.append("Build Type: " + BuildConfig.BUILD_TYPE + "\n")
-    sb.append("Debug: " + BuildConfig.DEBUG + "\n")
-    sb.append("Flavor: " + BuildConfig.FLAVOR + "\n")
+    sb.append(getRawException(e))
     extraInfo?.let {
       sb.append("══════════ Extra Info ══════════\n")
       it.forEach { (key, value) ->
         sb.append("$key: $value\n")
       }
     }
+    sb.append("═════════ ShowMe Info ═════════\n")
+    sb.append("App ID: " + BuildConfig.APPLICATION_ID + "\n")
+    sb.append("Version Code: " + BuildConfig.VERSION_CODE + "\n")
+    sb.append("Version Name: " + BuildConfig.VERSION_NAME + "\n")
+    sb.append("Build Type: " + BuildConfig.BUILD_TYPE + "\n")
+    sb.append("Debug: " + BuildConfig.DEBUG + "\n")
+    sb.append("Flavor: " + BuildConfig.FLAVOR + "\n")
     sb.append("═══════════════════════════\n")
     writeUEHException(sb.toString())
     defaultUEH?.uncaughtException(t, e)
+  }
+
+  /**
+   * For uncaught Errors indeed
+   */
+  private fun getRawException(e: Throwable) :String{
+    val sb = java.lang.StringBuilder()
+    sb.append("═══════════ RAW EXCEPTION ═══════════\n\n")
+    sb.append("$e".trimIndent())
+    val arr = e.stackTrace
+    for (i in arr.indices) {
+      sb.append("${arr[i]}\n")
+    }
+
+    // If the exception was thrown in a background thread inside AsyncTask, then the actual exception can be found with getCause
+    sb.append("\n═══════════ CAUSE ═══════════\n\n")
+    //    Throwable cause = e.getCause();
+    val cause = System.err //printStackTrace()
+    if (cause != null) {
+      sb.append("$cause".trimIndent())
+      //      arr = cause.getStackTrace();
+      for (i in arr.indices) {
+          sb.append("${arr[i]}")
+      }
+    }
+    sb.append("═══════════════════════════\n\n")
+    return sb.toString()
   }
 
 
@@ -85,7 +114,7 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
     try {
       val gpxfile = File(file, filename ?: UEH_FILE_NAME)
       val writer = FileWriter(gpxfile)
-      writer.append(content)
+      writer.append("\n\n$content")
       writer.flush()
       writer.close()
     } catch (e: Exception) {
