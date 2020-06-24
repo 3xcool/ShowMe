@@ -50,12 +50,12 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
     sb.append("Class Line: $line\n\n")
     sb.append(getRawException(e))
     extraInfo?.let {
-      sb.append("══════════ Extra Info ══════════\n")
+      sb.append("\n══════════ Extra Info ══════════\n")
       it.forEach { (key, value) ->
         sb.append("$key: $value\n")
       }
     }
-    sb.append("═════════ ShowMe Info ═════════\n")
+    sb.append("\n═════════ ShowMe Info ═════════\n")
     sb.append("App ID: " + BuildConfig.APPLICATION_ID + "\n")
     sb.append("Version Code: " + BuildConfig.VERSION_CODE + "\n")
     sb.append("Version Name: " + BuildConfig.VERSION_NAME + "\n")
@@ -90,7 +90,6 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
           sb.append("${arr[i]}")
       }
     }
-    sb.append("═══════════════════════════\n\n")
     return sb.toString()
   }
 

@@ -42,8 +42,6 @@ import kotlin.math.min
  * @param mShowMeStatus Turn On/Off ShowMe lib
  * @param mLogTypeMode  For Production = Warning, For Development = Debug
  * @param mWatcherTypeMode  For Production = Public, For Development = Dev
- * @param mShowTimeInterval  Is Deprecated
- * @see  setTimeIntervalStatus() for Time Interval logs
  */
 class ShowMe(var mShowMeStatus: Boolean = true,
              var mTAG: String = "ShowMe",
@@ -195,11 +193,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   }
 
 
-  @Deprecated("Use clearLog() instead.", replaceWith = ReplaceWith("clearLog()"))
-  fun finishLog() {
-    mLogsId.clear()
-    summaryList.clear()
-  }
+
 
   /**
    * Clear all logs control
@@ -243,7 +237,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     var outputMsg = if (wrapMsg!!) wrapMessage(msg) else msg
 
     outputMsg = when (logType) {
-      LogType.ALL, LogType.VERBOSE -> outputMsg
+      LogType.VERBOSE -> outputMsg
       LogType.SUCCESS -> "$defaultCharSuccess $outputMsg"
       LogType.ERROR -> "$defaultCharError $outputMsg"
       LogType.WARNING -> "$defaultCharWarning $outputMsg"
@@ -458,11 +452,6 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   var filemanWM: FilemanWM? = null
   var FILE_WRITE_APPEND = true
 
-
-  @Deprecated("Not in use anymore", replaceWith = ReplaceWith("initFileman()"))
-  fun injectContext(context: Context) {
-    this.mContext = context
-  }
 
   /**
    * For writing log in file
