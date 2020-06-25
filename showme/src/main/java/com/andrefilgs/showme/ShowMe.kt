@@ -45,8 +45,8 @@ import kotlin.math.min
  */
 class ShowMe(var mShowMeStatus: Boolean = true,
              var mTAG: String = "ShowMe",
-             private val mLogTypeMode: LogType = LogType.DEBUG,
-             private val mWatcherTypeMode: WatcherType = WatcherType.DEV) {
+             private var mLogTypeMode: LogType = LogType.DEBUG,
+             private var mWatcherTypeMode: WatcherType = WatcherType.DEV) {
 
   //region local variables
   private val MAX_LOG_LENGTH = 4000
@@ -134,6 +134,14 @@ class ShowMe(var mShowMeStatus: Boolean = true,
 
   fun disableShowMe() {
     mShowMeStatus = false
+  }
+
+  fun setWatcherLevel(watcherType: WatcherType){
+    this.mWatcherTypeMode = watcherType
+  }
+
+  fun setLogTypeLevel(logType: LogType){
+    this.mLogTypeMode = logType
   }
 
 
