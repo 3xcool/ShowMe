@@ -490,6 +490,10 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     return true
   }
 
+  fun enableFilemanWorkManager() { this.mUseWorkManager = true }
+  fun disableFilemanWorkManager(){ this.mUseWorkManager = false}
+
+
 
 
   private fun isFilemanAvailable(): Boolean {
