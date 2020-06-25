@@ -89,6 +89,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
   override val name: String
     get() = ::ShowMeHttpSender.name
 
+
   fun enableWorkManager() { this.useWorkManager = true }
   fun disableWorkManager(){ this.useWorkManager = false}
   fun enableHttpLogs() { this.showHttpLogs = true }

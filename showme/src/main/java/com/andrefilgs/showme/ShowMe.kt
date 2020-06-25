@@ -43,10 +43,7 @@ import kotlin.math.min
  * @param mLogTypeMode  For Production = Warning, For Development = Debug
  * @param mWatcherTypeMode  For Production = Public, For Development = Dev
  */
-class ShowMe(var mShowMeStatus: Boolean = true,
-             var mTAG: String = "ShowMe",
-             private var mLogTypeMode: LogType = LogType.DEBUG,
-             private var mWatcherTypeMode: WatcherType = WatcherType.DEV) {
+class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", private var mLogTypeMode: LogType = LogType.DEBUG, private var mWatcherTypeMode: WatcherType = WatcherType.DEV) {
 
   //region local variables
   private val MAX_LOG_LENGTH = 4000
@@ -56,28 +53,28 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   var mTAGSuffix = ""
   var mShowMeTag = setShowMeTagFinal()
 
-  fun addTagSuffix(suffix:String){
+  fun addTagSuffix(suffix: String) {
     this.mTAGSuffix = suffix
     this.mShowMeTag = setShowMeTagFinal()
   }
 
-  fun addTagPrefix(prefix:String){
+  fun addTagPrefix(prefix: String) {
     this.mTAGPrefix = prefix
     this.mShowMeTag = setShowMeTagFinal()
   }
 
-  private fun setShowMeTag(tag:String){
+  private fun setShowMeTag(tag: String) {
     this.mTAG = tag
     this.mShowMeTag = setShowMeTagFinal()
   }
 
-  private fun setShowMeTagFinal():String{
-    return if("$mTAGPrefix$mTAG$mTAGSuffix".length > MAX_TAG_LENGTH) "ShowMe" else "$mTAGPrefix$mTAG$mTAGSuffix"
+  private fun setShowMeTagFinal(): String {
+    return if ("$mTAGPrefix$mTAG$mTAGSuffix".length > MAX_TAG_LENGTH) "ShowMe" else "$mTAGPrefix$mTAG$mTAGSuffix"
   }
 
   var mMaxWrapLogSize = 1500
 
-  private var summaryList: MutableList<Pair<LogcatType,String>> = mutableListOf()
+  private var summaryList: MutableList<Pair<LogcatType, String>> = mutableListOf()
 
   //For Time control
   var mPrecisionAbsoluteTime = 7
@@ -88,7 +85,8 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   var mAbsoluteTimeIntervalActive: Boolean = false
   var mRelativeTimeIntervalActive: Boolean = false
   var mRelativeByIdTimeIntervalActive: Boolean = false  //to be backward compatible
-//  var mCurrentTime = getNow()
+
+  //  var mCurrentTime = getNow()
   var mCurrentTime = getEllapsedRealTime()
   var mAbsoluteTimeInterval: Long = mCurrentTime                 //time difference between now and begin (startLog())
   var mRelativeTimeInterval: Long = mCurrentTime                 //time difference between now and last log
@@ -120,11 +118,11 @@ class ShowMe(var mShowMeStatus: Boolean = true,
 
   //Fileman
   private var mWriteLog = false
-  private var mUseWorkManager = false  //Set to true in buildFilemane() if you want to use WorkManager + Coroutine while writing your logs
+  private var mUseWorkManagerFileman = false  //Set to true if you want to use WorkManager + Coroutine while writing your logs
 
 
   //Senders
-  private var mSendLog:Boolean?=false // Using WorkManager for Senders
+  private var mSendLog: Boolean? = false
   //endregion
 
 
@@ -136,11 +134,11 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     mShowMeStatus = false
   }
 
-  fun setWatcherLevel(watcherType: WatcherType){
+  fun setWatcherLevel(watcherType: WatcherType) {
     this.mWatcherTypeMode = watcherType
   }
 
-  fun setLogTypeLevel(logType: LogType){
+  fun setLogTypeLevel(logType: LogType) {
     this.mLogTypeMode = logType
   }
 
@@ -152,7 +150,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     showRelativeById?.let { mRelativeByIdTimeIntervalActive = it }
   }
 
-  fun setTimeIntervalPrecision(absolute:Int?=mPrecisionAbsoluteTime, relative:Int?=mPrecisionRelativeTime, relativeById:Int?=mPrecisionRelativeByIdTime){
+  fun setTimeIntervalPrecision(absolute: Int? = mPrecisionAbsoluteTime, relative: Int? = mPrecisionRelativeTime, relativeById: Int? = mPrecisionRelativeByIdTime) {
     absolute?.let { mPrecisionAbsoluteTime = it }
     relative?.let { mPrecisionRelativeTime = it }
     relativeById?.let { mPrecisionRelativeByIdTime = it }
@@ -185,7 +183,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   }
 
   //https://sangsoonam.github.io/2017/03/01/do-not-use-curenttimemillis-for-time-interval.html
-  private fun getEllapsedRealTime():Long{
+  private fun getEllapsedRealTime(): Long {
     return SystemClock.elapsedRealtime()
   }
 
@@ -193,14 +191,12 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * Start log timer for time interval control
    */
   fun startLog() {
-//    val now = getNow()
+    //    val now = getNow()
     val now = getEllapsedRealTime()
     mAbsoluteTimeInterval = now
     mRelativeTimeInterval = now
     mLogsId.clear()
   }
-
-
 
 
   /**
@@ -220,27 +216,26 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   /**
    * Design By Contract
    */
-  fun dbc(rule: Boolean, msg: String, logType: LogType? = LogType.ERROR, watcherType: WatcherType? = WatcherType.PUBLIC, showMeId:Int?=0, logcatType: LogcatType?=LogcatType.WARNING): String {
+  fun dbc(rule: Boolean, msg: String, logType: LogType? = LogType.ERROR, watcherType: WatcherType? = WatcherType.PUBLIC, showMeId: Int? = 0, logcatType: LogcatType? = LogcatType.WARNING): String {
     if (rule) return ""
     //    skipLine()
-    return showMeLog(logcatType,"⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!, logId = showMeId?:0)
+    return showMeLog(logcatType, "⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!, logId = showMeId ?: 0)
     //    skipLine()
   }
 
 
-  private fun isLoggable(logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType):Boolean{
-//    if(showMeStatus == null || logType == null || watcherType == null) return false
-    if(logType == null || watcherType == null) return false
-//    if (!mShowMeStatus) return false
+  private fun isLoggable(logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType): Boolean {
+    //    if(showMeStatus == null || logType == null || watcherType == null) return false
+    if (logType == null || watcherType == null) return false
+    //    if (!mShowMeStatus) return false
     if (watcherType.type < mWatcherTypeMode.type) return false
     if (logType.type < mLogTypeMode.type) return false
     return true
   }
 
-  private fun prepareLogMsg(msg: String, logType: LogType? = defaultLogType, wrapMsg: Boolean? = defaultWrapMsg,
-                            logId: Int = 0, withTimePrefix:Boolean?=true): String? {
+  private fun prepareLogMsg(msg: String, logType: LogType? = defaultLogType, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, withTimePrefix: Boolean? = true): String? {
 
-//    if(!isLoggable(mShowMeStatus, logType, watcherType)) return null
+    //    if(!isLoggable(mShowMeStatus, logType, watcherType)) return null
 
     var outputMsg = if (wrapMsg!!) wrapMessage(msg) else msg
 
@@ -260,7 +255,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     val currentTime = getNow() //to get current time
     val ellapsedRealTime = getEllapsedRealTime()  //for time interval
 
-    if(withTimePrefix.orDefault(true)){
+    if (withTimePrefix.orDefault(true)) {
       if (mCurrentTimeActive.orDefault()) timePrefix = "now:${Utils.convertTime(currentTime, Utils.getNowFormat())}"
 
       if (mAbsoluteTimeIntervalActive.orDefault()) {
@@ -301,30 +296,29 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    *
    * Each log stored in summary is a Log snapshot with respective timePrefix and logcatType
    */
-  fun showSummary(logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType?=defaultSummaryLogCatType, writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog) {
-    skipLine(1, "─", 100, logcatType =  logcatType)
+  fun showSummary(logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType? = defaultSummaryLogCatType, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog) {
+    skipLine(1, "─", 100, logcatType = logcatType)
     title("SUMMARY", logType, watcherType, logcatType = logcatType, writeLog = writeLog, sendLog = sendLog)
     summaryList.forEach {
-      showMeLog(it.first, it.second,logType= logType, watcherType =  watcherType, addSummary = false, withTimePrefix = false, writeLog = writeLog, sendLog = sendLog) //summary logs don't need timePrefix, we are using the respective log time prefix
+      showMeLog(it.first, it.second, logType = logType, watcherType = watcherType, addSummary = false, withTimePrefix = false, writeLog = writeLog, sendLog = sendLog) //summary logs don't need timePrefix, we are using the respective log time prefix
     }
   }
 
-  fun title(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0, logcatType: LogcatType?=defaultTitleLogCatType,
-            writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
-//    var vertical ="║"
+  fun title(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0, logcatType: LogcatType? = defaultTitleLogCatType, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+    //    var vertical ="║"
     val horiz = "═"
     val topL = "╔"
     val topR = "╗"
     val botL = "╚"
     val botR = "╝"
     //Only for LogCat clean view
-    showMeLog(logcatType,"$topL${horiz.repeat(msg.length + 8 )}$topR",logType, watcherType, addSummary = false,logId = logId, writeLog = false, sendLog = false)
+    showMeLog(logcatType, "$topL${horiz.repeat(msg.length + 8)}$topR", logType, watcherType, addSummary = false, logId = logId, writeLog = false, sendLog = false)
     showMeLog(logcatType, "╠═══ ${msg.toUpperCase(Locale.ROOT)} ═══╣", logType, watcherType, addSummary = false, logId = logId, writeLog = false, sendLog = false)
-    showMeLog(logcatType,"$botL${horiz.repeat(msg.length + 8 )}$botR",logType, watcherType, addSummary = false,logId = logId, writeLog = false, sendLog = false)
-    return showMeLog(LogcatType.NONE, msg.toUpperCase(Locale.ROOT), logType, watcherType, addSummary, logId= logId, writeLog = writeLog, sendLog = sendLog)   //NONE will not print in Logcat
+    showMeLog(logcatType, "$botL${horiz.repeat(msg.length + 8)}$botR", logType, watcherType, addSummary = false, logId = logId, writeLog = false, sendLog = false)
+    return showMeLog(LogcatType.NONE, msg.toUpperCase(Locale.ROOT), logType, watcherType, addSummary, logId = logId, writeLog = writeLog, sendLog = sendLog)   //NONE will not print in Logcat
   }
 
-  fun skipLine(qty: Int = skipLineQty, repeatableChar: String = skipLineRepeatableChar, repeatQty: Int = skipLineRepeatableCharQty, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType?=defaultGeneralLogCatType) {
+  fun skipLine(qty: Int = skipLineQty, repeatableChar: String = skipLineRepeatableChar, repeatQty: Int = skipLineRepeatableCharQty, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType? = defaultGeneralLogCatType) {
     for (i in 1..qty) {
       showMeLog(logcatType, msg = repeatableChar.repeat(repeatQty), watcherType = watcherType)
     }
@@ -357,41 +351,33 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * @param withTimePrefix -> if you want to enable/disable timePrefix. Best approach is to use setTimeIntervalStatus()
    */
 
-  fun showMeLog(logcatType: LogcatType?=LogcatType.VERBOSE,
-                msg: String,
-                logType: LogType? = defaultLogType,
-                watcherType: WatcherType? = defaultWatcherType,
-                addSummary: Boolean? = defaultAddSummary,
-                wrapMsg: Boolean? = defaultWrapMsg,
-                logId: Int = 0,
-                writeLog:Boolean?=mWriteLog,
-                sendLog:Boolean?=mSendLog,
-                withTimePrefix: Boolean?=true): String {
+  fun showMeLog(logcatType: LogcatType? = LogcatType.VERBOSE, msg: String, logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog, withTimePrefix: Boolean? = true): String {
     //ShowMe user may want to send log to a server without showing it at Logcat, so...
 
 
     val isLoggable = isLoggable(logType, watcherType)
     val showMeLog = prepareLogMsg(msg, logType, wrapMsg, logId, withTimePrefix = withTimePrefix)
     showMeLog?.let {
-      if(isLoggable){
-        if(mShowMeStatus.orDefault()){
-        when (logcatType) {
-          LogcatType.VERBOSE -> Log.v(mShowMeTag , showMeLog)
-          LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
-          LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
-          LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
-          LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
-          LogcatType.NONE -> {} //do nothing
+      if (isLoggable) {
+        if (mShowMeStatus.orDefault()) {
+          when (logcatType) {
+            LogcatType.VERBOSE -> Log.v(mShowMeTag, showMeLog)
+            LogcatType.DEBUG -> Log.d(mShowMeTag, showMeLog)
+            LogcatType.INFO -> Log.i(mShowMeTag, showMeLog)
+            LogcatType.WARNING -> Log.w(mShowMeTag, showMeLog)
+            LogcatType.ERROR -> Log.e(mShowMeTag, showMeLog)
+            LogcatType.NONE -> {
+            } //do nothing
+          }
+
+          if (addSummary!!) {
+            summaryList.add(summaryList.size, Pair(logcatType ?: defaultSummaryLogCatType, it))
+          }
         }
 
-          if (addSummary!!){
-            summaryList.add(summaryList.size, Pair(logcatType ?:defaultSummaryLogCatType, it))
-          }
-      }
+        if (writeLog.orDefault()) writeLogFile(showMeLog)  //write log even if it is not loggable
 
-      if (writeLog.orDefault()) writeLogFile(showMeLog)  //write log even if it is not loggable
-
-      if(sendLog.orDefault()) sendLog(it)  //send log even if it is not loggable
+        if (sendLog.orDefault()) sendLog(it)  //send log even if it is not loggable
 
       }
       return showMeLog
@@ -413,40 +399,33 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * @param writeLog -> Granular control to write or not this specific log, even if this is Loggable
    * @param sendLog -> Granular control to send or not this specific log, even if this is Loggable
    */
-  fun d(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
+  fun d(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
     return showMeLog(LogcatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
-  fun i(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
+  fun i(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
     return showMeLog(LogcatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
-  fun w(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
+  fun w(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
     return showMeLog(LogcatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
-  fun e(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
+  fun e(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
     return showMeLog(LogcatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
-  fun v(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0,
-        writeLog:Boolean?=mWriteLog, sendLog:Boolean?=mSendLog): String {
+  fun v(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
     return showMeLog(LogcatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
   companion object {
     fun getSpecialChars(): String =
-      "☕ ⭐⭕✨❌⚡❎✅ 🎃 ⛔ 🚫 🔍🐞💩🔊💡✋⛔⌚⏰⌛⏳❓❔❗❕ " + "✊✋ ↻ ↺ ⏩⏪⏫⏬ ☣☢☠ ⓘ " + "🔧 💣 🔒 🔓🔔🏁🏆🎯  " +
-          "🚩 🎌 ⛳ " + "💉🔮🎊🎉🎂 💰 💱 💲 💳 💴 💵 💶 💷 💸 " + "🚪 📨 📤 📥 📩 🔥☁ 👀 🌁⛅ 🎦🌋 " + "📌 📍📎 📜 📃 📄 📅 📆 📇🔃  ➿  ☔⚓ " + " ⚽⛄⛅⛎ ⛪⛲⛵⛺⛽ 💀 ☠ 👻 👽 👾 " +
-          "🎅 💃 💁 💬 🍰 💎 💍  🏃   "
+      "☕ ⭐⭕✨❌⚡❎✅ 🎃 ⛔ 🚫 🔍🐞💩🔊💡✋⛔⌚⏰⌛⏳❓❔❗❕ " + "✊✋ ↻ ↺ ⏩⏪⏫⏬ ☣☢☠ ⓘ " + "🔧 💣 🔒 🔓🔔🏁🏆🎯  " + "🚩 🎌 ⛳ " + "💉🔮🎊🎉🎂 💰 💱 💲 💳 💴 💵 💶 💷 💸 " + "🚪 📨 📤 📥 📩 🔥☁ 👀 🌁⛅ 🎦🌋 " + "📌 📍📎 📜 📃 📄 📅 📆 📇🔃  ➿  ☔⚓ " + " ⚽⛄⛅⛎ ⛪⛲⛵⛺⛽ 💀 ☠ 👻 👽 👾 " + "🎅 💃 💁 💬 🍰 💎 💍  🏃   "
   }
 
   //region ================ Fileman ================
@@ -457,6 +436,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   var SHOWME_FOLDER = "ShowMe"
   var SHOWME_FILENAME = "ShowMeLogs.json"
 
+  var filemanActive: Boolean? = null
   var filemanWM: FilemanWM? = null
   var FILE_WRITE_APPEND = true
 
@@ -469,9 +449,10 @@ class ShowMe(var mShowMeStatus: Boolean = true,
    * @param useWorkManager -> Activate this if you want to use WorkManager + Coroutine for writing file
    * @param viewLifecycleOwner -> To get WorkManager liveData observe output
    */
-  fun addFileman(filemanActive:Boolean, showFilemanLog: Boolean? = false, context: Context, drive: Int?, folder: String?, filename: String?, append: Boolean?, useWorkManager: Boolean? = false, viewLifecycleOwner: LifecycleOwner? = null): Boolean {
+  fun addFileman(filemanActive: Boolean, showFilemanLog: Boolean? = false, context: Context, drive: Int?, folder: String?, filename: String?, append: Boolean?, useWorkManager: Boolean? = false, viewLifecycleOwner: LifecycleOwner? = null): Boolean {
     mWriteLog = filemanActive
-    useWorkManager?.let { mUseWorkManager = it }
+    if(filemanActive) enableFileman() else disableFileman()
+    useWorkManager?.let { mUseWorkManagerFileman = it }
     drive?.let { if (it <= FilemanDrivers.values().size) SHOWME_DRIVE = it }
     folder?.let { SHOWME_FOLDER = it }
     filename?.let { SHOWME_FILENAME = it }
@@ -479,7 +460,7 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     this.mContext = context
     if (showFilemanLog.orDefault(false)) FilemanLogger.enableLog() else FilemanLogger.disableLog()
 
-    if (mUseWorkManager.orDefault(false)) {
+    if (mUseWorkManagerFileman.orDefault(false)) {
       return if (viewLifecycleOwner != null) {
         filemanWM = FilemanWM(context, viewLifecycleOwner)
         true
@@ -490,27 +471,38 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     return true
   }
 
-  fun enableFilemanWorkManager() { this.mUseWorkManager = true }
-  fun disableFilemanWorkManager(){ this.mUseWorkManager = false}
+  fun enableFilemanWorkManager() {
+    this.mUseWorkManagerFileman = true
+  }
 
+  fun disableFilemanWorkManager() {
+    this.mUseWorkManagerFileman = false
+  }
 
+  fun enableFileman() {
+    this.filemanActive = true
+  }
+
+  fun disableFileman() {
+    this.filemanActive = false
+  }
 
 
   private fun isFilemanAvailable(): Boolean {
-    return if (!mUseWorkManager.orDefault(false)) {
-      ::mContext.isInitialized
+    return if (!mUseWorkManagerFileman.orDefault(false)) {
+      ::mContext.isInitialized && this.filemanActive.orDefault(false)
     } else {
-      ::mContext.isInitialized && filemanWM != null
+      ::mContext.isInitialized && filemanWM != null && this.filemanActive.orDefault(false)
     }
   }
 
 
   fun writeLogFile(fileContent: String) {
     if (!isFilemanAvailable()) {
-      dbc(false, "Fileman has bot been initialized properly")
+      dbc(false, "Fileman is not active")
       return
     }
-    if (!mUseWorkManager.orDefault(false)) {
+    if (!mUseWorkManagerFileman.orDefault(false)) {
       Fileman.write("$mShowMeTag: $fileContent\n", mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILENAME, true)
     } else {
       filemanWM?.writeLaunch("$mShowMeTag $fileContent\n", mContext, SHOWME_DRIVE, SHOWME_FOLDER, SHOWME_FILENAME, append = FILE_WRITE_APPEND, withTimeout = false)
@@ -518,8 +510,8 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   }
 
 
-  fun deleteLogFile(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME): Boolean {
-    if(drive!! <= FilemanDrivers.values().size){
+  fun deleteLogFile(drive: Int? = SHOWME_DRIVE, folder: String? = SHOWME_FOLDER, filename: String? = SHOWME_FILENAME): Boolean {
+    if (drive!! <= FilemanDrivers.values().size) {
       if (::mContext.isInitialized) {
         Fileman.delete(mContext, drive, folder!!, filename!!)
       }
@@ -528,10 +520,10 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     return false
   }
 
-  fun readLogFile(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME): String? {
-    if(drive!! <= FilemanDrivers.values().size){
+  fun readLogFile(drive: Int? = SHOWME_DRIVE, folder: String? = SHOWME_FOLDER, filename: String? = SHOWME_FILENAME): String? {
+    if (drive!! <= FilemanDrivers.values().size) {
       if (::mContext.isInitialized) {
-        Fileman.read(mContext, drive, folder?:SHOWME_FOLDER, filename?:SHOWME_FILENAME)
+        Fileman.read(mContext, drive, folder ?: SHOWME_FOLDER, filename ?: SHOWME_FILENAME)
       }
       return ""
     }
@@ -545,44 +537,44 @@ class ShowMe(var mShowMeStatus: Boolean = true,
 
   private val baseCoroutineScope = CoroutineScope(Dispatchers.Default)
 
-  var mSenders: MutableList<Sender>?= mutableListOf()
+  var mSenders: MutableList<Sender>? = mutableListOf()
 
   /**
    * @param sender              -> HTTP Sender
    */
-  fun addSender(sender : Sender){
+  fun addSender(sender: Sender) {
     mSendLog = sender.mActive
-    when(sender){
+    when (sender) {
       is ShowMeHttpSender -> {
         mSenders?.add(sender)
       }
-//      else -> d("Sender ${sender.getName} not available ")
+      //      else -> d("Sender ${sender.getName} not available ")
     }
   }
 
-  fun getSenderById(id:String): Sender? {
-    return mSenders?.firstOrNull {sender-> sender.id == id }
+  fun getSenderById(id: String): Sender? {
+    return mSenders?.firstOrNull { sender -> sender.id == id }
   }
 
-  fun pruneSenderWork(sender: ShowMeHttpSender){
+  fun pruneSenderWork(sender: ShowMeHttpSender) {
     sender.workManager.pruneWork()
   }
 
-  fun cancelSenderWork(sender: ShowMeHttpSender){
+  fun cancelSenderWork(sender: ShowMeHttpSender) {
     sender.workManager.cancelAllWork()
   }
 
-  fun pruneAllWorks(){
-    mSenders?.forEach {sender->
-      if(sender is ShowMeHttpSender){
+  fun pruneAllWorks() {
+    mSenders?.forEach { sender ->
+      if (sender is ShowMeHttpSender) {
         sender.workManager.pruneWork()
       }
     }
   }
 
-  fun cancelAllWorks(){
-    mSenders?.forEach {sender->
-      if(sender is ShowMeHttpSender){
+  fun cancelAllWorks() {
+    mSenders?.forEach { sender ->
+      if (sender is ShowMeHttpSender) {
         sender.workManager.cancelAllWork()
       }
     }
@@ -592,11 +584,11 @@ class ShowMe(var mShowMeStatus: Boolean = true,
     return sender != null
   }
 
-  private fun sendLog(logContent:String){
+  private fun sendLog(logContent: String) {
     baseCoroutineScope.launch(Dispatchers.Default) {
-      mSenders?.forEach {sender ->
-        if(isSenderAvailable(sender)){
-          when(sender){
+      mSenders?.forEach { sender ->
+        if (isSenderAvailable(sender)) {
+          when (sender) {
             is ShowMeHttpSender -> sender.sendLog(logContent)
           }
         }
@@ -608,10 +600,10 @@ class ShowMe(var mShowMeStatus: Boolean = true,
   /**
    * User can send some content to a server using ShowMeHttpSender
    */
-  fun sendContent(content:String){
+  fun sendContent(content: String) {
     baseCoroutineScope.launch(Dispatchers.Default) {
-      mSenders?.forEach {sender ->
-        if(sender is ShowMeHttpSender) sender.sendLog(content)
+      mSenders?.forEach { sender ->
+        if (sender is ShowMeHttpSender) sender.sendLog(content)
       }
     }
   }
