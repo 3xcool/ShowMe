@@ -57,6 +57,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     //use Fileman for writing logs
 //    mShowMeDev.addFileman(true,false, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true, viewLifecycleOwner = this)
     mShowMeDev.addFileman(true,false, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true, viewLifecycleOwner = null)
+    mShowMeDev.setDefaultWriteLog(true)
 
     //If you want to use WorkManager + Coroutine for writing files and observe LiveData response
     //    mShowMeDev.buildFileman(true, this, FilemanDrivers.Internal.type, "Sample Folder", "Log Test", append = true, useWorkManager = true, viewLifecycleOwner = this)
