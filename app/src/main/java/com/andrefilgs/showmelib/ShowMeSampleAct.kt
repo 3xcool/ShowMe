@@ -124,8 +124,9 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
     //Add Senders
-//    httpSender1?.let { mShowMeDev.addSender(it) }
-    mShowMeDev.addSender(httpSender2)
+//    httpSender1?.let { mShowMeDev.addSender(it, true) }
+//    mShowMeDev.addSender(httpSender2, defaultSendLog = false) //logs will NOT be sent, we must set to true in each log call that we want to send
+    mShowMeDev.addSender(httpSender2, defaultSendLog = true) //all logs will be sent by default
 
     //some extra fun (I hope you don't need to use them)
 //    mShowMeDev.cancelSenderWork(mShowMeDev.getSenderById("ID-02") as ShowMeHttpSender)

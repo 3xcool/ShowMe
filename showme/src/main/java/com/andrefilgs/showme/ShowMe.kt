@@ -122,7 +122,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
 
 
   //Senders
-  private var mSendLog: Boolean? = false
+  var mDefaultSendLog: Boolean? = false
   //endregion
 
 
@@ -216,10 +216,10 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * Design By Contract
    */
-  fun dbc(rule: Boolean, msg: String, logType: LogType? = LogType.ERROR, watcherType: WatcherType? = WatcherType.PUBLIC, showMeId: Int? = 0, logcatType: LogcatType? = LogcatType.WARNING): String {
+  fun dbc(rule: Boolean, msg: String, logType: LogType? = LogType.ERROR, watcherType: WatcherType? = WatcherType.PUBLIC, showMeId: Int? = 0, logcatType: LogcatType? = LogcatType.WARNING, writeLog: Boolean?=mWriteLog): String {
     if (rule) return ""
     //    skipLine()
-    return showMeLog(logcatType, "⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!, logId = showMeId ?: 0)
+    return showMeLog(logcatType, "⛔⛔⛔ Broken Contract: $msg", logType = logType!!, watcherType = watcherType!!, logId = showMeId ?: 0, writeLog = writeLog)
     //    skipLine()
   }
 
@@ -296,7 +296,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    *
    * Each log stored in summary is a Log snapshot with respective timePrefix and logcatType
    */
-  fun showSummary(logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType? = defaultSummaryLogCatType, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog) {
+  fun showSummary(logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, logcatType: LogcatType? = defaultSummaryLogCatType, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog) {
     skipLine(1, "─", 100, logcatType = logcatType)
     title("SUMMARY", logType, watcherType, logcatType = logcatType, writeLog = writeLog, sendLog = sendLog)
     summaryList.forEach {
@@ -304,7 +304,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
     }
   }
 
-  fun title(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0, logcatType: LogcatType? = defaultTitleLogCatType, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+  fun title(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = false, logId: Int = 0, logcatType: LogcatType? = defaultTitleLogCatType, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog): String {
     //    var vertical ="║"
     val horiz = "═"
     val topL = "╔"
@@ -351,7 +351,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    * @param withTimePrefix -> if you want to enable/disable timePrefix. Best approach is to use setTimeIntervalStatus()
    */
 
-  fun showMeLog(logcatType: LogcatType? = LogcatType.VERBOSE, msg: String, logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog, withTimePrefix: Boolean? = true): String {
+  fun showMeLog(logcatType: LogcatType? = LogcatType.VERBOSE, msg: String, logType: LogType? = defaultLogType, watcherType: WatcherType? = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog, withTimePrefix: Boolean? = true): String {
     //ShowMe user may want to send log to a server without showing it at Logcat, so...
 
 
@@ -399,26 +399,26 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
    * @param writeLog -> Granular control to write or not this specific log, even if this is Loggable
    * @param sendLog -> Granular control to send or not this specific log, even if this is Loggable
    */
-  fun d(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+  fun d(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog): String {
     return showMeLog(LogcatType.DEBUG, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
-  fun i(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+  fun i(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog): String {
     return showMeLog(LogcatType.INFO, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
-  fun w(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+  fun w(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog): String {
     return showMeLog(LogcatType.WARNING, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
-  fun e(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+  fun e(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog): String {
     return showMeLog(LogcatType.ERROR, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
 
-  fun v(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mSendLog): String {
+  fun v(msg: String, logType: LogType = defaultLogType, watcherType: WatcherType = defaultWatcherType, addSummary: Boolean? = defaultAddSummary, wrapMsg: Boolean? = defaultWrapMsg, logId: Int = 0, writeLog: Boolean? = mWriteLog, sendLog: Boolean? = mDefaultSendLog): String {
     return showMeLog(LogcatType.VERBOSE, msg, logType, watcherType, addSummary, wrapMsg, logId, writeLog = writeLog, sendLog = sendLog)
   }
 
@@ -499,7 +499,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
 
   fun writeLogFile(fileContent: String) {
     if (!isFilemanAvailable()) {
-      dbc(false, "Fileman is not active")
+      dbc(false, "Fileman is not active", writeLog = false)
       return
     }
     if (!mUseWorkManagerFileman.orDefault(false)) {
@@ -542,8 +542,8 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   /**
    * @param sender              -> HTTP Sender
    */
-  fun addSender(sender: Sender) {
-    mSendLog = sender.mActive
+  fun addSender(sender: Sender, defaultSendLog:Boolean?) {
+    defaultSendLog?.let {  mDefaultSendLog = defaultSendLog }
     when (sender) {
       is ShowMeHttpSender -> {
         mSenders?.add(sender)
