@@ -461,12 +461,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
     if (showFilemanLog.orDefault(false)) FilemanLogger.enableLog() else FilemanLogger.disableLog()
 
     if (mUseWorkManagerFileman.orDefault(false)) {
-      return if (viewLifecycleOwner != null) {
-        filemanWM = FilemanWM(context, viewLifecycleOwner)
-        true
-      } else {
-        false
-      }
+      filemanWM = FilemanWM(context, viewLifecycleOwner)
     }
     return true
   }
@@ -523,7 +518,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
   fun readLogFile(drive: Int? = SHOWME_DRIVE, folder: String? = SHOWME_FOLDER, filename: String? = SHOWME_FILENAME): String? {
     if (drive!! <= FilemanDrivers.values().size) {
       if (::mContext.isInitialized) {
-        Fileman.read(mContext, drive, folder ?: SHOWME_FOLDER, filename ?: SHOWME_FILENAME)
+        return Fileman.read(mContext, drive, folder ?: SHOWME_FOLDER, filename ?: SHOWME_FILENAME)
       }
       return ""
     }

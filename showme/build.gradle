@@ -45,7 +45,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
 
     //Fileman
-    api 'com.github.3xcool:fileman:2.1.0'
+    api 'com.github.3xcool:fileman:2.1.2'
 
     //Gson
     api 'com.google.code.gson:gson:2.8.6'
