@@ -90,6 +90,8 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     get() = ::ShowMeHttpSender.name
 
 
+  fun setUrl(url:String) { this.mUrl = url }
+
   fun enableWorkManager() { this.useWorkManager = true }
   fun disableWorkManager(){ this.useWorkManager = false}
   fun enableHttpLogs() { this.showHttpLogs = true }
