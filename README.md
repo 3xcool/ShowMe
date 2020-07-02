@@ -7,24 +7,49 @@
 
 
 # About
-This is a small logger but with powerful resources, extensible API which provides utility on top of Android's normal Log class.
+This is a logger library that provides some utility features on top of Android's normal Log class.
 
 You can control who can see your logs with **WatcherType** and use **LogTypes** with special chars to enhance your Log reading.
 
-You can also use **Design By Contract**, Summary and store your logs in local file using **Fileman** library.
+You can also use the concept of **Design By Contract** and **Summary**
 
-Control your logs with a powerful **Time Control**. There are 4 types of time described below (Current, Absolute, Relative and Relative by ID).
+Use **Fileman** library to store logs in a local file. 
+
+Use **HTTP Sender** to send logs to a remote server (it's possible to add more than one sender). In the future we can add some other type of Senders like a toaster or notification. 
+
+Fileman and HTTP Sender are using WorkManager with Coroutines under the hood to guarantee log chronology and to keep the job working even when the app is not running anymore.
+
+You can control your logs with a powerful **Time Control**. There are 4 types of time: Current, Absolute, Relative and Relative by ID.
 
 Use default Logcat types (Verbose, Debug, Info, Warning, Error) to enhance readability and add color control.
 
-# Example
+**Uncaught Error Handler (UEH)**: if the application crashes by some exception error like Null Pointer Exception, ShowMeUncaughtExceptionHandler class will store in a local file all the necessary and available information. If it's a throwing error, it will be possible to know the exact Class, Method and Line number. 
+
+
+# Contents
+
+- [ShowMe Log Sample](#showme-log-sample)
+- [Readability](#readability)
+- [Watcher Types](#watcher-types)
+- [Log Types](#log-types)
+- [Time Interval](#time-interval)
+- [Implementation](#implementation)
+- [Create ShowMe object](#create-showme-object)
+- [Log Methods](#log-methods)
+- [Fileman](#fileman)
+- [HTTP Sender](#http-sender)
+- [ShowMe Uncaught Exception Handler (UEH)](#showme-uncaught-exception-handler-ueh)
+
+
+
+## ShowMe Log Sample
 
 A small log example using ShowMe library.
 
 ![](wiki_images/showme_log_example_v1.png) 
 
 
-# Readability
+## Readability
 To enhance readability I've changed line space and Android Logcat colors.
 
 ![](wiki_images/logcat_colors.png) 
@@ -32,29 +57,6 @@ To enhance readability I've changed line space and Android Logcat colors.
 ![](wiki_images/logcat_line_space.png) 
 
 
-
-# Dependency
-
-In build.graddle (Project)
-```kotlin
-  allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-    }
-  }
-```
-
-    
-In build.graddle (app)
-```kotlin
-dependencies {
-implementation 'com.github.3xcool:showme:$LATEST_VERSION'
-}
-```
-
-# Before we start, let’s learn some concepts first.
 
 ## Watcher Types
 
@@ -159,6 +161,27 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 
 **For more detailed examples, please check ShowMeSampleAct.**
 
+## Implementation
+
+In build.graddle (Project)
+```kotlin
+  allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+    }
+  }
+```
+
+    
+In build.graddle (app)
+```kotlin
+dependencies {
+implementation 'com.github.3xcool:showme:$LATEST_VERSION'
+}
+```
+
 ## Time Interval
 There are 4 types:
 
@@ -173,7 +196,7 @@ You can control which one to show in your Logcat with the fun ```setTimeInterval
 
 **Now let’s get a deep dive to all resources of this lib**.
 
-# Create ShowMe object
+## Create ShowMe object
 
 ```kotlin
 var mShowMeDev = ShowMe(
@@ -202,7 +225,7 @@ Example:
 mShowMeDev = ShowMe(true, "Sample-Dev", LogType.DEBUG.type, WatcherType.DEV.type)
 ```
 
-# Log methods
+## Log Methods
 
 Just like the original function Log.d() we have the same for ShowMe.
 To show your log as Verbose v(), Debug d(), Info i(), Warning w() and Error e() using Logcat Category strategy.
@@ -236,7 +259,7 @@ mShowMeDev.d(“Only dev can see this error”, LogType.ERROR.type, WatcherType.
 
 **For more examples, please check ShowMeSampleAct activity.**
 
-# title()
+### Title
 
 To increase readability add some title to your logs.
 
@@ -249,7 +272,7 @@ mShowMeDev.title("Some title", LogType.ALL.type, WatcherType.PUBLIC.type)
 */
 ```
  
-# dbc() - Design By Contract
+### Design By Contract
 
 Powerful way to check possible error during your business logic.
 
@@ -272,7 +295,7 @@ Example:
 dbc (a > b, "$a is not greater than $b")
 ```
 
-# showSummary()
+### showSummary()
 
 Will show all logs that have been added to summary.
 
@@ -280,20 +303,36 @@ Will show all logs that have been added to summary.
 showSummary(logType: Int = defaultLogType, watcherType: Int = defaultWatcherType, logcatType: LogcatType?=defaultSummaryLogCatType) 
 ```
 
-# skipLine()
+### skipLine()
 
 skipLineQty = how many lines to skip
 skipLineRepeatableChar = which char to repeat, default is “=”
 skipLineRepeatableCharQty = how many repeatable char, default is 100.
 
-# startLog()
+### startLog()
 Clear mLogsId, mAbsoluteTimeInterval and mRelativeTimeInterval in order to restart time interval.
 
-# clearLog()
+### clearLog()
 Clear mLogsId and summaryList.
 
 
-# Fileman
+### enableShowMe()
+Enable showMe at runtime
+
+### disableShowMe()
+Disable showMe at runtime.
+
+### getSpecialChars
+If you want to see alternative special chars to your logs.
+
+### setDefaultCharsValue
+If you want to change default values.
+
+### setSkipLineDefaultValues
+If you want to change log skipLine() default values.
+
+
+## Fileman
 
 ShowMe is using Fileman Library to store your logs into a file. 
 To use it call ```buildFileman()```
@@ -332,39 +371,100 @@ Example 2 (With WorkManager):
     })
 ```
 
-
-
-# Other self explanatory methods:
-
-## enableShowMe()
-Enable showMe at runtime
-
-## disableShowMe()
-Disable showMe at runtime.
-
-## Read Log
+### Read Log
 Read the content stored in local file.
 
 ```kotlin
 readLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
 ```
 
-
-## Delete Log
+### Delete Log
 Delete log local file.
 
 ```kotlin
 deleteLog(drive:Int?=SHOWME_DRIVE, folder: String?=SHOWME_FOLDER, filename: String?=SHOWME_FILENAME)
 ```
 
-## getSpecialChars()
-If you want to see alternative special chars to your logs.
+## HTTP Sender
 
-## setDefaultCharsValue()
-If you want to change default values.
+HTTP Sender have two constructors:
 
-## setSkipLineDefaultValues()
-If you want to change log skipLine() default values.
+Class
+```kotlin
+ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter, 10000, 10000, false, true, true)
+```
+
+Builder
+```kotlin
+val httpSender1 :Sender? = ShowMeHttpSender.Builder(this)
+  .setId("ID-01")  //you don't need to pass this value, default is using UUID to generate random ID
+  .active(false)  //set this to true in order to send logs to the server
+  .addHeaders(headers)
+  .addHeader("Connection", "keep-alive")
+  .buildUrl(protocol, host, path, null)
+  .setConverter(gsonConverter)  // or PlainTextConverter
+  .setUseCache(false)
+  .setReadTimeout(10000)
+  .setConnectTimeout(10000)
+  .setUseWorkManager(true)
+  .showHttpLogs(true)
+  .build()
+```
+
+### Body Converters
+
+It's possible to send the logs as Plain Text or as JSON.
+
+
+Bear in mind that this library is trying to be as lightweight as possible, so there is only Gson library for serialization. Feel free to send a PR with another library implementation.
+
+
+#### Body model
+ShowMe is using ShowMeHttpLogModel class to serialize to JSON. This class have two properties: "showMeLog" and "timestamp".
+
+```kotlin
+val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
+```
+
+It's also possible to use your custom Class (e.g. UserAPIModel) for serialization but keep in mind that this solution requires Reflection.
+Pass which field is for showMeLog and timestamp and you can add a HashMap<String,String> for aditional info.
+
+```kotlin
+val listOfFieldsValues = mutableMapOf<String,String?>()
+listOfFieldsValues[UserAPIModel::project.name] = "someProjectName"
+val gsonConverter = GsonBodyConverter(Gson(), UserAPIModel::class.java, UserAPIModel::payload.name, UserAPIModel::timestamp.name, listOfFieldsValues) //showMe logs will be add to payload field.
+```
+
+## ShowMe Uncaught Exception Handler UEH
+
+The most useful and important resource of this library.
+If the application crashes by some exception error like Null Pointer Exception, ShowMeUncaughtExceptionHandler class will store in a local file all the necessary and available information. You can add some extra info such as APP ID, Version Code, Flavor and so on.
+
+Bear in mind that is not possible to get Class + Method + Line Number for every type of error, but some useful information will be given at "RAW EXCEPTION" and "CAUSE" sections.
+
+Building UEH object
+```kotlin
+val extraInfo = mapOf<String, String>(Pair("some key", "some value"))
+ueh = ShowMeUncaughtExceptionHandler(this, "UEH_test_file", true, extraInfo )  //set addNewline to true for adding "\n" after each line read (default is true)
+Thread.setDefaultUncaughtExceptionHandler(ueh)
+```
+
+Using UEH object
+```kotlin
+ueh.getUEHcontent() //for getting UEH log
+ueh.deleteUEHfile() //for deleting UEH file
+```
+
+You can send the log using HTTP Sender
+```kotlin
+sender.sendLogSync(ueh.getUEHcontent())
+```
+
+UEH logs
+![](wiki_images/UEH_throw_report.png)
+
+![](wiki_images/UEH_crash_report.png)
+
 
 # License
 
