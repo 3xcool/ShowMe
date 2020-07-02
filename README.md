@@ -396,7 +396,7 @@ ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, pat
 
 Builder
 ```kotlin
-val httpSender1 :Sender? = ShowMeHttpSender.Builder(this)
+val httpSender :Sender? = ShowMeHttpSender.Builder(this)
   .setId("ID-01")  //you don't need to pass this value, default is using UUID to generate random ID
   .active(false)  //set this to true in order to send logs to the server
   .addHeaders(headers)
@@ -409,6 +409,12 @@ val httpSender1 :Sender? = ShowMeHttpSender.Builder(this)
   .setUseWorkManager(true)
   .showHttpLogs(true)
   .build()
+```
+
+Add sender to ShowMe object
+
+```kotlin
+mShowMeDev.addSender(httpSender, defaultSendLog = true)  //set to true in order to send all logs (if it's Loggable, respecting Watcher and LogType levels)
 ```
 
 ### Body Converters
