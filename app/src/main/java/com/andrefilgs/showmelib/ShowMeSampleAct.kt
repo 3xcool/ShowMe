@@ -121,7 +121,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val httpSender1 = ShowMeHttpSender(false,null, applicationContext ,headers, protocol, host, path, null, bodyConverter =  PlainTextConverter)
 
     //Building second HTTP Sender
-    val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,false, true, true)
+      val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,false, true, true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
@@ -194,7 +194,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     }
 
     btn_throw_ueh_crash.setOnClickListener {
-      tv_log.text = someException
+      tv_log.text = someException  //this variable is null. Forcing NPE
     }
 
   }

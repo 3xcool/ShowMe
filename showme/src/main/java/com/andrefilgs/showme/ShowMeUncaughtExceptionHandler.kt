@@ -87,7 +87,7 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
       sb.append("$cause".trimIndent())
       //      arr = cause.getStackTrace();
       for (i in arr.indices) {
-          sb.append("${arr[i]}")
+          sb.append("${arr[i]}\n")
       }
     }
     return sb.toString()
