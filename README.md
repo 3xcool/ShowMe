@@ -446,7 +446,7 @@ val gsonConverter = GsonBodyConverter(Gson(), UserAPIModel::class.java, UserAPIM
 The most useful and important resource of this library.
 If the application crashes by some exception error like Null Pointer Exception, ShowMeUncaughtExceptionHandler class will store in a local file all the necessary and available information. You can add some extra info such as APP ID, Version Code, Flavor and so on.
 
-Bear in mind that is not possible to get Class + Method + Line Number for every type of error, but some useful information will be given at "RAW EXCEPTION" and "CAUSE" sections.
+Bear in mind that it's not possible to get Class + Method + Line Number for every type of error, but some useful information will be given at "RAW EXCEPTION" and "CAUSE" sections.
 
 Building UEH object
 ```kotlin
@@ -474,7 +474,7 @@ UEH logs
 
 # License
 
-Copyright 2020 André Filgueiras
+Copyright© 2020 André Filgueiras
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
