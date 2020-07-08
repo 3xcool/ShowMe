@@ -1,11 +1,43 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
+
+ext {
+    bintrayRepo = 'maven' // Name of the Bintray repo you created
+    bintrayName = 'com.3xcool.utility:showme' // Bintray package name
+
+    publishedGroupId = 'com.3xcool.utility' // Group ID of the SDK which will be added in implementation line of gradle
+    artifact = 'showme' // Artifact ID of the SDK which will be added in implementation line of gradle
+    libraryVersion = '2.0.0-alpha10' //versionMajor * 10000 + versionMinor * 100 + versionPatch  // Version of the library you created in Bintray
+
+    libraryName = 'ShowMe' // It is generally the module name
+    libraryDescription = 'Logger Library' // Small description of the library
+
+    siteUrl = 'https://github.com/3xcool/showme'
+    gitUrl = 'https://github.com/3xcool/showme'
+
+    developerId = '3xcool'
+    developerName = 'Andre Filgueiras'
+    developerEmail = 'alg.filgueiras@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+
+    //Bintray Credentials
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('mylocal.properties').newDataInputStream())
+
+    bintrayUsername = properties.getProperty('BINTRAY_USERNAME')
+    bintrayUserOrg = properties.getProperty('BINTRAY_ORG')
+    bintrayApiKey = properties.getProperty('BINTRAY_API_KEY')
+}
 
 android {
     compileSdkVersion 29
@@ -45,7 +77,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
 
     //Fileman
-    api 'com.github.3xcool:fileman:2.1.2'
+    api 'com.3xcool.utility:fileman:2.1.4'
+
 
     //Gson
     api 'com.google.code.gson:gson:2.8.6'
@@ -72,3 +105,6 @@ task createJar(type: Copy) {
 }
 
 createJar.dependsOn(deleteJar, build)
+
+
+apply from: 'bintray.script'
