@@ -170,7 +170,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
 //    inputData.putString(ShowMeConstants.KEY_HTTP_BODY, body) //USE DTO
     val showMeKey = Utils.getNow().toString() + getShowMeWorkIDCounter()  //some random key to avoid collision
     inputData.putString(ShowMeConstants.KEY_HTTP_SHOW_ME_ID, showMeKey)
-    WorkManagerDTO.putWorkContent(showMeKey, body)
+    WorkManagerDTO.putLogContent(showMeKey, body)
 
     readTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_TIMEOUT, readTimeout)}
     connectTimeout?.let { inputData.putInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, connectTimeout)}

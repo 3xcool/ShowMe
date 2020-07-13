@@ -84,12 +84,12 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val gsonConverter = GsonBodyConverter(Gson(), ShowMeAPILogModel()) //faster solution
 
     val listOfFieldsValues = mutableMapOf<String,String?>()
-    listOfFieldsValues[UserAPIModel::project.name] = "test"
+    listOfFieldsValues[UserAPIModel::project.name] = "showme"
     val gsonConverter = GsonBodyConverter(Gson(), UserAPIModel::class.java, UserAPIModel::payload.name, UserAPIModel::timestamp.name, listOfFieldsValues) //showMe logs will be add to payload field.
 
     //CHANGE HERE
     val protocol = "http://"
-    val host = "showme.com.br/"
+    val host = "showme.com/"
     val path = "v1/SomeAPI"
 
     val headers : MutableMap<String, String?> = mutableMapOf<String,String?>()
@@ -112,7 +112,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
       .setUseCache(false)
       .setReadTimeout(10000)
       .setConnectTimeout(10000)
-      .setUseWorkManager(true)
+      .setUseWorkManager(false)
       .showHttpLogs(true)
       .build()
 
@@ -121,16 +121,17 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 //    val httpSender1 = ShowMeHttpSender(false,null, applicationContext ,headers, protocol, host, path, null, bodyConverter =  PlainTextConverter)
 
     //Building second HTTP Sender
-      val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,false, true, true)
+      val httpSender2 = ShowMeHttpSender(true,"ID-02", applicationContext,  headers, protocol, host, path, null, gsonConverter,10000,10000,false,
+        true, true)
 
 //    val res = httpSender2.sendLogSync("Your message here")  //you can use ShowMeHttpSender
 
     //Add Senders
-//    httpSender1?.let { mShowMeDev.addSender(it, true) }
+    httpSender1?.let { mShowMeDev.addSender(it, true) }
 //    mShowMeDev.addSender(httpSender2, defaultSendLog = false) //logs will NOT be sent, we must set to true in each log call that we want to send
     mShowMeDev.addSender(httpSender2, defaultSendLog = true) //all logs will be sent by default
 
-    //some extra fun (I hope you don't need to use them)
+    //some extra fun
 //    mShowMeDev.cancelSenderWork(mShowMeDev.getSenderById("ID-02") as ShowMeHttpSender)
 //    mShowMeDev.cancelAllWorks()
 //    mShowMeDev.pruneAllWorks()
@@ -205,8 +206,8 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     val watcher = WatcherType.values()[watcherSel]
 
     val logMsg = ShowMe().d(msg!!, watcherType = watcher, logType = logType)
-    mShowMeDev.d(msg,logType, watcher)  //if you want to test Sender or Fileman
-    mShowMeDev.d("$msg-again",logType, watcher)  //if you want to test Sender or Fileman
+    mShowMeDev.d(msg,logType, watcher, sendLog = true)  //if you want to test Sender or Fileman
+    mShowMeDev.d("$msg-again",logType, watcher, sendLog = true)  //if you want to test Sender or Fileman
     tv_log.append("\n$logMsg")
   }
 

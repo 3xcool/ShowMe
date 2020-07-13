@@ -8,13 +8,16 @@ def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
 
+def localProperties = new Properties()
+localProperties.load(project.rootProject.file('mylocal.properties').newDataInputStream())
+
 ext {
     bintrayRepo = 'maven' // Name of the Bintray repo you created
     bintrayName = 'com.3xcool.utility:showme' // Bintray package name
 
     publishedGroupId = 'com.3xcool.utility' // Group ID of the SDK which will be added in implementation line of gradle
     artifact = 'showme' // Artifact ID of the SDK which will be added in implementation line of gradle
-    libraryVersion = '2.0.0-alpha10' //versionMajor * 10000 + versionMinor * 100 + versionPatch  // Version of the library you created in Bintray
+    libraryVersion = '2.0.0' //versionMajor * 10000 + versionMinor * 100 + versionPatch  // Version of the library you created in Bintray
 
     libraryName = 'ShowMe' // It is generally the module name
     libraryDescription = 'Logger Library' // Small description of the library
@@ -31,12 +34,9 @@ ext {
     allLicenses = ["Apache-2.0"]
 
     //Bintray Credentials
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('mylocal.properties').newDataInputStream())
-
-    bintrayUsername = properties.getProperty('BINTRAY_USERNAME')
-    bintrayUserOrg = properties.getProperty('BINTRAY_ORG')
-    bintrayApiKey = properties.getProperty('BINTRAY_API_KEY')
+    bintrayUsername = localProperties.getProperty('BINTRAY_USERNAME')
+    bintrayUserOrg = localProperties.getProperty('BINTRAY_ORG')
+    bintrayApiKey = localProperties.getProperty('BINTRAY_API_KEY')
 }
 
 android {
@@ -57,19 +57,20 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        debug{
+        }
     }
 
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
 
     //Kotlin Coroutines
     def kotlinCoroutineVersion = "1.0.1"
@@ -78,7 +79,6 @@ dependencies {
 
     //Fileman
     api 'com.3xcool.utility:fileman:2.1.4'
-
 
     //Gson
     api 'com.google.code.gson:gson:2.8.6'

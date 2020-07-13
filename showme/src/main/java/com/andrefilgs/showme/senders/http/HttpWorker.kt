@@ -18,7 +18,7 @@ internal class HttpWorker(appContext: Context, workerParams: WorkerParameters)
 //      val body = inputData.getString(ShowMeConstants.KEY_HTTP_BODY)  //due to WM limitations due to "Data cannot occupy more than 10240KB when serialized [android-workmanager]"
 
       val key = inputData.getString(ShowMeConstants.KEY_HTTP_SHOW_ME_ID)
-      val body = WorkManagerDTO.getWorkContent(key)
+      val body = WorkManagerDTO.getLogContent(key)
 
       val readTimeout = inputData.getInt(ShowMeConstants.KEY_HTTP_TIMEOUT, ShowMeHttp.TIMEOUT)
       val connectTimeout = inputData.getInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, ShowMeHttp.CONNECT_TIMEOUT)
