@@ -1,7 +1,6 @@
 # ShowMe library 
 
-[![Release](https://jitpack.io/v/3xcool/showme.svg)]
-(https://jitpack.io/#3xcool/ShowMe)
+[ ![Download](https://api.bintray.com/packages/3xcool/maven/com.3xcool.utility%3Ashowme/images/download.svg) ](https://bintray.com/3xcool/maven/com.3xcool.utility%3Ashowme/_latestVersion)
 
 ![](wiki_images/showme_icon_200.png) 
 
@@ -162,23 +161,11 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 **For more detailed examples, please check ShowMeSampleAct.**
 
 ## Implementation
-
-In build.graddle (Project)
-```kotlin
-  allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-    }
-  }
-```
-
     
 In build.graddle (app)
 ```kotlin
 dependencies {
-implementation 'com.github.3xcool:showme:$LATEST_VERSION'
+implementation 'com.3xcool.utility:showme:$LATEST_VERSION'
 }
 ```
 
