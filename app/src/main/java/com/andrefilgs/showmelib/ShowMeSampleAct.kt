@@ -76,7 +76,7 @@ class ShowMeSampleAct : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
   //You can send ShowMe logs to a server using Sender (for now we only have one type -> ShowMeHttpSender)
   //I've no intention to add or replace any powerful REST API library inside ShowMe, so I'm using a simple barebone Http solution (please see ShowMeHttp).
-  //You can send a Plain Text or JSON in HTTP Body. By using JSON you can send as ShowMeAPILogModel or any other model that you desire (using UserAPIModel as an andrefilgs).
+  //You can send a Plain Text or JSON in HTTP Body. By using JSON you can send as ShowMeAPILogModel or any other model that you desire.
   //ShowMe is using GSON library for JSON serialization because is the most used one. In the future I will add more options.
   //Just be aware that using your custom object requires Kotlin Reflection (see GsonBodyConverter -> convertToJson)
   private fun buildSender(){
