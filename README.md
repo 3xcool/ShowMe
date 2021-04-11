@@ -166,7 +166,7 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 In build.graddle (app)
 ```kotlin
 dependencies {
-implementation 'com.3xcool.utility:showme:$LATEST_VERSION'
+implementation 'com.3xcool:showme:$LATEST_VERSION'
 }
 ```
 
