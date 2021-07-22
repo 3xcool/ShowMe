@@ -1,7 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.32'
+    ext{
+        kotlin_version = "1.4.32"
+        // SDK and tools
+        compileSdkVersion = 29
+        minSdkVersion = 19
+        targetSdkVersion = 29
+    }
     repositories {
         google()
         jcenter()
@@ -15,12 +21,6 @@ buildscript {
 
 //        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-    }
-    ext {
-        // SDK and tools
-        compileSdkVersion = 29
-        minSdkVersion = 19
-        targetSdkVersion = 29
     }
 }
 
