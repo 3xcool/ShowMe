@@ -1,6 +1,7 @@
 # ShowMe library 
 
-[ ![Download](https://api.bintray.com/packages/3xcool/maven/com.3xcool.utility%3Ashowme/images/download.svg) ](https://bintray.com/3xcool/maven/com.3xcool.utility%3Ashowme/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.3xcool/showme/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.3xcool/showme)
+
 
 ![](wiki_images/showme_icon_200.png) 
 
@@ -165,7 +166,7 @@ In production mode you can set to false (disable all logs) or choose **LogType =
 In build.graddle (app)
 ```kotlin
 dependencies {
-implementation 'com.3xcool.utility:showme:$LATEST_VERSION'
+implementation 'com.3xcool:showme:$LATEST_VERSION'
 }
 ```
 

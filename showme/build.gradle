@@ -7,8 +7,8 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 def versionMajor = 2
-def versionMinor = 0
-def versionPatch = 3
+def versionMinor = 1
+def versionPatch = 0
 
 def localProperties = new Properties()
 localProperties.load(project.rootProject.file('mylocal.properties').newDataInputStream())
