@@ -380,7 +380,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
             } //do nothing
           }
 
-          addSummary?.let{
+          if(addSummary.orDefault(false)){
             summaryList.add(summaryList.size, Pair(logcatType ?: defaultSummaryLogCatType, showMelog))
           }
         }
