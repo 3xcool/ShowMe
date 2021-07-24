@@ -9,20 +9,22 @@
     <string name="xml_show_me_sample">Show Me sample</string>
 
     <string-array name="spinner_log_category">
-        <item>DEBUG</item>
-        <item>DETAIL</item>
-        <item>EVENT</item>
-        <item>INFO</item>
-        <item>WARNING</item>
-        <item>ERROR</item>
-        <item>SUCCESS</item>
         <item>ALL</item>
+        <item>SUCCESS</item>
+        <item>ERROR</item>
+        <item>WARNING</item>
+        <item>INFO</item>
+        <item>EVENT</item>
+        <item>DETAIL</item>
+        <item>DEBUG</item>
     </string-array>
 
     <string-array name="spinner_watcher_category">
-        <item>DEV</item>
-        <item>GUEST</item>
         <item>PUBLIC</item>
+        <item>GUEST</item>
+        <item>DEV</item>
+
+
 
 
     </string-array>
