@@ -1,4 +1,4 @@
-package com.andrefilgs.showmelib
+package com.andrefilgs.showmesample
 
 
 import android.os.Parcelable
