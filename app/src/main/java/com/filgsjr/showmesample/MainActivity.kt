@@ -1,9 +1,10 @@
-package com.andrefilgs.showmesample
+package com.filgsjr.showmesample
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.andrefilgs.showmesample.databinding.ActivityMainBinding
+import com.andrefilgs.showme.BuildConfig
+import com.filgsjr.showmesample.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {

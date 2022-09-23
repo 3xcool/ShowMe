@@ -1,6 +1,7 @@
 package com.andrefilgs.showme
 
 import android.content.Context
+import com.andrefilgs.showme.BuildConfig
 import com.andrefilgs.fileman.auxiliar.orDefault
 import com.andrefilgs.showme.utils.Utils
 import java.io.*

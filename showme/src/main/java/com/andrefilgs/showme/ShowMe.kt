@@ -377,6 +377,7 @@ class ShowMe(var mShowMeStatus: Boolean = true, var mTAG: String = "ShowMe", pri
             LogcatType.WARNING -> Log.w(mShowMeTag, showMelog)
             LogcatType.ERROR -> Log.e(mShowMeTag, showMelog)
             LogcatType.NONE -> Unit
+            null -> Unit
           }
 
           if(addSummary.orDefault(false)){

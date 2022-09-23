@@ -1,4 +1,4 @@
-package com.andrefilgs.showmesample
+package com.filgsjr.showmesample
 
 import android.os.Bundle
 import android.view.View
@@ -6,6 +6,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.andrefilgs.fileman.FilemanDrivers
+import com.andrefilgs.showme.BuildConfig
 import com.andrefilgs.showme.LogcatType
 import com.andrefilgs.showme.ShowMe
 import com.andrefilgs.showme.ShowMeLogger
@@ -15,7 +16,7 @@ import com.andrefilgs.showme.model.WatcherType
 import com.andrefilgs.showme.senders.Sender
 import com.andrefilgs.showme.senders.ShowMeHttpSender
 import com.andrefilgs.showme.senders.http.converters.GsonBodyConverter
-import com.andrefilgs.showmesample.databinding.ActivityShowMeSampleBinding
+import com.filgsjr.showmesample.databinding.ActivityShowMeSampleBinding
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext

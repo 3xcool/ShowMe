@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.andrefilgs.showmesample">
+          package="com.filgsjr.showmesample">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -14,7 +14,8 @@
             android:roundIcon="@mipmap/ic_launcher"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name="com.andrefilgs.showmesample.MainActivity">
+        <activity android:name="com.filgsjr.showmesample.MainActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -22,7 +23,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.andrefilgs.showmesample.ShowMeSampleAct"
+        <activity android:name="com.filgsjr.showmesample.ShowMeSampleAct"
+                android:exported="false"
                 android:windowSoftInputMode="stateHidden">
         </activity>
     </application>

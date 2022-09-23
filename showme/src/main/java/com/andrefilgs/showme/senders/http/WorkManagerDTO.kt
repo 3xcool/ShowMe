@@ -19,7 +19,7 @@ object WorkManagerDTO {
 
   internal fun putLogContent(key:String, value: String?){
 //    dataTransferObject[key] = value
-    value?.let{fifoLogList.add(it)}
+    value?.let{ fifoLogList.add(it)}
   }
 
 }

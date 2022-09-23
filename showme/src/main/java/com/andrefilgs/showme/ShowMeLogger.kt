@@ -10,10 +10,12 @@ class ShowMeLogger {
     private val TAG = "ShowMe-Logger"
     private var showLogs:Boolean = false
 
-    fun enableLogs(){showLogs = true}
-    fun disableLogs(){showLogs = false}
+    fun enableLogs(){
+      showLogs = true}
+    fun disableLogs(){
+      showLogs = false}
 
-    fun log(logContent:String, logcatType: LogcatType?=LogcatType.VERBOSE, tag:String? ){
+    fun log(logContent:String, logcatType: LogcatType?= LogcatType.VERBOSE, tag:String? ){
       val mTag = tag ?: TAG
       if(showLogs.orDefault()){
         when(logcatType){
