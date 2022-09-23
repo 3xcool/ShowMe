@@ -1,4 +1,4 @@
-package com.andrefilgs.showme;
+package com.filgsjr.showme;
 
 import android.content.Context;
 

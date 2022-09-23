@@ -26,7 +26,7 @@ class GsonBodyConverter<T : Any>(
     private var timestampField:String?=null,
     private var listFieldsValue: Map<String, String?>?=null
 
-) :Converters() {
+) : Converters() {
 
   private val TAG = "ShowMe-GsonBodyConverter"
 

@@ -206,7 +206,7 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
     private var useWorkManager :Boolean? = false
     private var showHttpLogs :Boolean? = false
 
-    fun active(value:Boolean):Builder{
+    fun active(value:Boolean): Builder {
       this.active = value
       return this
     }
@@ -220,17 +220,17 @@ class ShowMeHttpSender (override var mActive: Boolean?=null,
       return this
     }
 
-    fun setId(value:String):Builder{
+    fun setId(value:String): Builder {
       this.id = value
       return this
     }
 
-    fun addHeader(key:String, value:String):Builder{
+    fun addHeader(key:String, value:String): Builder {
       this.headers[key] = value
       return this
     }
 
-    fun addHeaders(headers: Map<String, String?>):Builder{
+    fun addHeaders(headers: Map<String, String?>): Builder {
       this.headers.putAll(headers)
       return this
     }

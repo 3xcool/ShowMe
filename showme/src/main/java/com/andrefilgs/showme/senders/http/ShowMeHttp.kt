@@ -28,7 +28,7 @@ internal class ShowMeHttp {
     private val TAG = "ShowMe-Http"
 
 
-    private fun log(logcatType: LogcatType?=LogcatType.VERBOSE, logContent:String, showLog:Boolean?=showLogs){
+    private fun log(logcatType: LogcatType?=LogcatType.VERBOSE, logContent:String, showLog:Boolean?= showLogs){
       if(showLog.orDefault()){
         when(logcatType){
           LogcatType.VERBOSE -> Log.v(TAG, logContent)
@@ -100,7 +100,7 @@ internal class ShowMeHttp {
 
 
     fun makeRequestAsync(mUrl: String?, mMethod: String?, mBody: String?, mHeaders: Map<String, String?>?, readTimeout:Int?= TIMEOUT,
-                                 connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE, showLog: Boolean?=null): Deferred<HttpResponse?> {
+                         connectTimeout:Int?= CONNECT_TIMEOUT, useCache:Boolean?= USE_CACHE, showLog: Boolean?=null): Deferred<HttpResponse?> {
       return GlobalScope.async {
         makeRequest(mUrl, mMethod, mBody, mHeaders, readTimeout, connectTimeout, useCache, showLog)
       }

@@ -1,4 +1,4 @@
-package com.andrefilgs.showmesample
+package com.filgsjr.showmesample
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

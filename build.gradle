@@ -2,11 +2,15 @@
 
 buildscript {
     ext{
-        kotlin_version = "1.4.32"
+        kotlin_version = "1.7.10"
         // SDK and tools
-        compileSdkVersion = 29
-        minSdkVersion = 19
-        targetSdkVersion = 29
+        compileVersion = 33
+        minVersion = 21
+        targetVersion = 33
+
+        kotlinCoroutineVersion = "1.6.4"
+        gsonVersion = "2.9.0"
+        workVersion = "2.7.1"
     }
     repositories {
         google()
@@ -15,7 +19,7 @@ buildscript {
         
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -39,4 +43,16 @@ subprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+// VERY ATTENTION:
+// After Android 12 (S+) the Pending intent flag is obligatory and WorkManager library must be updated
+// This affects third libraries using WorkManager, so this will fix it
+// https://stackoverflow.com/questions/67045607/how-to-resolve-missing-pendingintent-mutability-flag-lint-warning-in-android-a
+allprojects {
+    project.configurations.all {
+        resolutionStrategy {
+            force "androidx.work:work-runtime-ktx:$workVersion"
+        }
+    }
 }

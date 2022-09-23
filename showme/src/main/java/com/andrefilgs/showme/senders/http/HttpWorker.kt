@@ -24,7 +24,7 @@ internal class HttpWorker(appContext: Context, workerParams: WorkerParameters)
       val connectTimeout = inputData.getInt(ShowMeConstants.KEY_HTTP_CONNECT_TIMEOUT, ShowMeHttp.CONNECT_TIMEOUT)
       val useCache = inputData.getBoolean(ShowMeConstants.KEY_HTTP_USE_CACHE, ShowMeHttp.USE_CACHE)
       val showHttpLogs = inputData.getBoolean(ShowMeConstants.KEY_HTTP_SHOW_HTTP_LOGS, ShowMeHttp.showLogs)
-      val httpRequest = ShowMeHttp.makeRequestAsync( url, method, body,  ShowMeConstants.headers, readTimeout, connectTimeout, useCache, showHttpLogs)
+      val httpRequest = ShowMeHttp.makeRequestAsync(url, method, body, ShowMeConstants.headers, readTimeout, connectTimeout, useCache, showHttpLogs)
 
       val res = httpRequest.await()
       if(res?.success.orDefault(false)){
