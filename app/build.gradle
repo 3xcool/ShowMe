@@ -56,8 +56,11 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
 
-//    implementation project (':showme')
-    implementation 'com.3xcool:showme:2.1.2'
+    //Fileman
+    implementation 'com.3xcool:fileman:2.2.2'
+
+    implementation project (':showme')
+//    implementation 'com.3xcool:showme:2.1.2'
 
     implementation "com.google.code.gson:gson:$gsonVersion"
 

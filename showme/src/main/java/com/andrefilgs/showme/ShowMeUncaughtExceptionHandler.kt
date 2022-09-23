@@ -58,8 +58,8 @@ class ShowMeUncaughtExceptionHandler(private val context: Context, private val f
     }
     sb.append("\n═════════ ShowMe Info ═════════\n")
     sb.append("App ID: " + BuildConfig.LIBRARY_PACKAGE_NAME + "\n")
-    sb.append("Version Code: " + BuildConfig.VERSION_CODE + "\n")
-    sb.append("Version Name: " + BuildConfig.VERSION_NAME + "\n")
+    sb.append("Version Code: " + BuildConfig.ShowMeVersionCode + "\n")
+    sb.append("Version Name: " + BuildConfig.ShowMeVersionName + "\n")
     sb.append("Build Type: " + BuildConfig.BUILD_TYPE + "\n")
     sb.append("Debug: " + BuildConfig.DEBUG + "\n")
     sb.append("═══════════════════════════\n")
